@@ -3,8 +3,6 @@ body {
 }
 
 #solider-shooter {
-  min-width: 320px;
-  max-width: 400px;
   border: 1px solid #444;
   margin-left: auto;
   margin-right: auto;
