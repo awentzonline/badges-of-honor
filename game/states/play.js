@@ -126,8 +126,8 @@ Play.prototype = {
         new ReaderAction({
           textObject: this.commandText,
           randomLines: [
-            ['Good Job. Level Complete.'],
-            ['Great shooting, soldier.\nGet ready for the next level.']
+            ['Good Job\nLevel Complete'],
+            ['Great shooting, soldier\nGet ready for the next level']
           ]
         }),
         {
