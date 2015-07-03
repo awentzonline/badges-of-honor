@@ -170,7 +170,7 @@ BadgeBlips.prototype.addBlip = function(x, y, body, duration, font, size) {
     {x:1.0, y:1.0}, 250, Phaser.Easing.Elastic.Out, true, 0
   );
   var tween = this.game.add.tween(blip.scale).to(
-    {x:0, y:0}, 250, Phaser.Easing.Elastic.In, false, duration
+    {y:0}, 250, Phaser.Easing.Elastic.In, false, duration
   );
   scaleTween.chain(tween);
   tween.onComplete.add(function () {
@@ -297,7 +297,7 @@ Enemy.prototype.constructor = Enemy;
 
 //global variables
 window.onload = function () {
-  var game = new Phaser.Game(400, 600, Phaser.AUTO, 'war-hero');
+  var game = new Phaser.Game(400, 600, Phaser.AUTO, 'badges-of-honor');
 
   // Game States
   game.state.add('achievements', require('./states/achievements'));
@@ -318,25 +318,37 @@ module.exports = [
   [100, ' First\nBlood'],
   [200, 'Second\n Blood'],
   [300, 'Killing\n Spree'],
-  [500, '   Total\nSnakedick'],
+  [500, ' Competent\nGun Operator'],
   [1000, 'The President\n   Loves You'],
   [1500, 'REALLY GOOD'],
   [2000, 'SO GOOD'],
-  [2500, 'YOU CAN BE\nANYTHING']
-  [3000, 'BEEFY KILLER'],
-  [4500, ' PRESIDENT\n OF BULLETS'],
-  [5000, 'Good Executor'],
+  [2500, 'YOU CAN BE\n ANYTHING'],
+  [3000, 'True Patriot'],
+  [3500, ' Senatorial\nEagle Prize'],
+  [4000, ' 25%\nRaise'],
+  [4500, 'President\n of the army'],
+  [5000, '   Good\nExecutor'],
   [5500, 'EXTRAJUDICIAL!'],
-  [6000, 'Tremendous\ngun shooting'],
-  [6500, 'I\'m very proud of you'],
-  [6000, ' SHARP\nSHOOTER'],
+  [6000, ' Tremendous\ngun shooting'],
+  [6500, '   I\'m very\nproud of you'],
+  [7000, ' SHARP\nSHOOTER'],
   [7500, '  BEST\nSHOOTER'],
-  [8000, ' PROMOTED TO\nSENIOR SHOOTER'],
-  [8500, 'INCREDIBEAST'],
-  [8000, 'Unbelievable'],
-  [9500, 'VERY PRESIDENTIAL'],
-  [9000, 'Kill Guy'],
-  [10000, 'Gun Operator']
+  [8000, ' Promoted to\nSENIOR SHOOTER'],
+  [8500, '     VERY\nPRESIDENTIAL'],
+  [9000, 'Unbelievable'],
+  [9500, '   Best\nKill-Guy'],
+  [10000, '   Total\nSnakedick'],
+  [10500, '     35%\nCommission'],
+  [11000, 'SUPER SOLDIER'],
+  [11500, 'Real good\nSOLDIER'],
+  [12000, 'ADMIRAL'],
+  [12500, 'PROMOTED TO\nBIG GENERAL'],
+  [13000, ' Extremely\nPresidential'],
+  [13500, 'True Detective'],
+  [14000, 'Cost of living\n Adjustment'],
+  [14500, ' You are\nthe flag'],
+  [15000, 'Found $20'],
+  [15500, '   Wife\nImpressed']
 ];
 
 },{}],12:[function(require,module,exports){
@@ -699,6 +711,9 @@ Play.prototype = {
     //
     this.badgeBlips = new BadgeBlips(this.game);
     this.game.add.existing(this.badgeBlips);
+    if (this.levelId == 0) {
+      this.showBadgeBlip('Enlistment\n   Bonus')
+    }
   },
   createScripts: function () {
     this.actionLists = new ActionLists({
@@ -917,7 +932,7 @@ Play.prototype = {
   },
   showBadgeBlip: function (text) {
     this.badgeBlips.addBlip(
-      this.game.width * 0.25, this.game.height * 0.85, text, 1000, 'dday', 36
+      this.game.width * 0.275, this.game.height * 0.85, text, 1000, 'dday', 42
     );
   }
 };
