@@ -7,7 +7,7 @@ function Enemy(game, x, y) {
   this.animations.add('idle', [0]);
   var deathAnim = this.animations.add('die', [1,2,3,4,5,6,7,8,9,10,11,12,13]);
   deathAnim.onComplete.add(function () {
-    game.sound.play('hit');
+    game.sound.play('hit', 1.0, false);
     this.kill();
     this.visible = true;
     this.exists = true;

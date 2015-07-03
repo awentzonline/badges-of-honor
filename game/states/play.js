@@ -28,9 +28,11 @@ Play.prototype = {
       var enemy = new Enemy(this.game, this.game.width * conf.x, this.game.height * conf.y)
       this.game.add.existing(enemy);
       enemy.inputEnabled = true;
-      enemy.events.onInputDown.add(this.enemyShot, this, enemy);
+      //enemy.input.pixelPerfectOver = true;
+      //enemy.events.onInputDown.add(this.enemyShot, this, enemy);
       this.enemyGroup.add(enemy);
     }.bind(this));
+    this.enemyGroup.sort('y', Phaser.Group.SORT_ASCENDING); // higher up is farther back
     //
     this.crosshair = this.game.add.sprite(0, 0, 'crosshair');
     this.crosshair.anchor.setTo(0.5, 0.5);
@@ -52,7 +54,6 @@ Play.prototype = {
     this.createScripts();
   },
   createScripts: function () {
-    console.log(ActionLists)
     this.actionLists = new ActionLists({
       'start': new ActionList(this.game, [
         new ReaderAction({
@@ -106,11 +107,26 @@ Play.prototype = {
     this.crosshair.position.setTo(pointer.x, pointer.y);
     this.shotCountdown -= dt;
     if (this.shotCountdown <= 0 && pointer.isDown) {
-      this.game.sound.play('shoot');
+      this.game.sound.play('shoot', 1.0, false, false);
       this.shotCountdown = this.shotDelay;
-      if (!this.allowedToShoot) {
-        this.onLose('You were executed for shooting too early.');
+      var hitEnemy;
+      // enemies are sorted back to front
+      for (var i = this.enemyGroup.length - 1; i >= 0; i--) {
+        var enemy = this.enemyGroup.children[i];
+        if (!enemy.alive || !enemy.exists) {
+          continue;
+        }
+        if (enemy.input.checkPointerDown(pointer)) {
+          hitEnemy = enemy;
+          break;
+        }    
       }
+      if (hitEnemy) {
+        this.enemyShot(hitEnemy);
+      }
+      // if (!this.allowedToShoot) {
+      //   this.onLose('You were executed for shooting too early.');
+      // }
     }
     if (!this.winTriggered && this.enemyGroup.countLiving() == 0) {
       this.onWin();
