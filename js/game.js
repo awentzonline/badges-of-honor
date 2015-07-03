@@ -514,11 +514,14 @@ Menu.prototype = {
 
   },
   create: function() {
-    var style = { font: '45px Arial', fill: '#ffffff', align: 'center'};
-    this.titleText = this.game.add.text(this.game.world.centerX, 300, 'War Hero\nThe Game!', style);
+    this.titleText = this.game.add.bitmapText(
+      this.game.world.centerX, 300, 'dday', 'War Hero\nThe Game!', 64
+    );
     this.titleText.anchor.setTo(0.5, 0.5);
 
-    this.instructionsText = this.game.add.text(this.game.world.centerX, 400, 'Click to play', { font: '16px Arial', fill: '#ffffff', align: 'center'});
+    this.instructionsText = this.game.add.bitmapText(
+      this.game.world.centerX, 400, 'dday', 'Click to play', 28
+    );
     this.instructionsText.anchor.setTo(0.5, 0.5);
 
     this.crosshair = new Crosshair(this.game, 0, 0);
@@ -527,6 +530,7 @@ Menu.prototype = {
   update: function() {
     var pointer = this.game.input.activePointer;
     if(pointer && pointer.justPressed()) {
+      this.game.sound.play('shoot')
       this.game.state.start('play', true, false, 0);
     }
   }
@@ -580,16 +584,19 @@ Play.prototype = {
     this.shotDelay = 0.2;
     this.shootSound = this.game.add.audio('shoot');
     //
+    this.numBullets = 20;
+    this.bulletText = this.game.add.bitmapText(this.game.width * 0.1, this.game.width * 0.9, 'dday', this.numBullets)
+    //
     this.scoreBlips = new Blips(this.game);
     this.game.add.existing(this.scoreBlips)
     //
     this.winTriggered = false;
     //
-    this.commandText = this.game.add.bitmapText(this.game.width * 0.5, this.game.height * 0.2, 'dday', '', 36);
+    this.commandText = this.game.add.bitmapText(this.game.width * 0.5, this.game.height * 0.15, 'dday', '', 36);
     this.commandText.anchor.setTo(0.5, 0);
-    // score
+    //
     this.interpScore = this.game.score;
-    this.scoreText = this.game.add.bitmapText(this.game.width * 0.5, this.game.height * 0.1, 'dday', '' + this.interpScore, 42);
+    this.scoreText = this.game.add.bitmapText(this.game.width * 0.5, this.game.height * 0.075, 'dday', this.interpScore, 42);
     this.scoreText.anchor.setTo(0.5, 0.5);
     //
     this.crosshair = new Crosshair(this.game, 0, 0);
@@ -625,6 +632,9 @@ Play.prototype = {
             ],
             [
               'What a shot!'
+            ],
+            [
+              'Get some!'
             ]
           ]
         }),
@@ -657,7 +667,8 @@ Play.prototype = {
           textObject: this.commandText,
           randomLines: [
             ['Good Job\nLevel Complete'],
-            ['Great shooting, soldier\nGet ready for the next level']
+            ['Great shooting, soldier\nGet ready for the next level'],
+            ['The President says good job\nPrepare for the next level']
           ]
         }),
         {
@@ -706,7 +717,7 @@ Play.prototype = {
     if (Math.abs(ds) > 0) {
       this.interpScore += Math.max(1, ds * 0.2);
       this.interpScore = Math.min(this.interpScore, this.game.score);
-      this.scoreText.text = '' + Math.floor(this.interpScore);
+      this.scoreText.text = Math.floor(this.interpScore);
     }
   },
   enemyShot: function(enemy) {
