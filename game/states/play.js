@@ -44,7 +44,7 @@ Play.prototype = {
     //
     this.shotCountdown = 0;
     this.shotDelay = 0.1;
-    this.shootSound = this.game.add.audio('shoot');
+    //this.shootSound = this.game.add.audio('shoot');
     //
     this.numBullets = 20;
     this.bulletType = this.game.add.sprite(this.game.width * 0.85, this.game.height * 0.95, 'm16ammo');
@@ -197,8 +197,8 @@ Play.prototype = {
     if (this.shotCountdown <= 0 && pointer.isDown && this.numBullets > 0) {
       this.numBullets -= 1;
       this.bulletText.text = this.numBullets;
-      //this.game.sound.play('shoot', 1.0, false, true);
-      this.shootSound.play();
+      this.game.sound.play('shoot', 1.0, false, true);
+      //this.shootSound.play();
       this.shotCountdown = this.shotDelay;
       var hitEnemy;
       // enemies are sorted back to front

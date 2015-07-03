@@ -43,8 +43,7 @@ JobAssignment.prototype = {
           {x:2, y:2}, 1000, Phaser.Easing.Elastic.Out, true, 0
         );
       }
-      if(this.assignmentCountdown < -2) { //pointer && pointer.justPressed()) {
-        this.game.sound.play('shoot');
+      if(this.assignmentCountdown < -2) {
         this.game.state.start('play', true, false, 0);
       }
     } else {
@@ -52,6 +51,7 @@ JobAssignment.prototype = {
       if (this.assChangeCountdown <= 0) {
         this.assignmentText.text = assignments[Math.floor(Math.random() * assignments.length)];
         this.assChangeCountdown = 0.1;
+        this.game.sound.play('select', 0.4);
       }
     }
   }
