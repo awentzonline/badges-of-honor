@@ -1,6 +1,8 @@
 'use strict';
 
 var _ = require('underscore');
+var achievementList = require('./achievements');
+var BadgeBlips = require('../elements/badgeblips');
 var Blips = require('../elements/blips');
 var Bloodsplosion = require('../elements/bloodsplosion');
 var Crosshair = require('../elements/crosshair');
@@ -20,6 +22,7 @@ Play.prototype = {
     this.levelId = levelId || 0;
     this.levelConfig = levelConfigs[this.levelId % levelConfigs.length];
     this.game.score = this.game.score || 0;
+    this.nextAchievementIndex = this.findNextAchievementIndex();
   },
   preload: function () {
     this.game.load.image('background', 'assets/' + this.levelConfig.background);
@@ -68,6 +71,9 @@ Play.prototype = {
     this.game.add.existing(this.crosshair);
     //
     this.createScripts();
+    //
+    this.badgeBlips = new BadgeBlips(this.game);
+    this.game.add.existing(this.badgeBlips);
   },
   createScripts: function () {
     this.actionLists = new ActionLists({
@@ -113,14 +119,27 @@ Play.prototype = {
         }
       ]),
       'hurryUp': new ActionList(this.game, [
+        {
+          start: function () {
+            this.gameState.showBadgeBlip('POTENTIAL\nPACIFIST')
+            this.actionList.next();
+          }
+        },
         new ReaderAction({
           textObject: this.commandText,
           lines: [
-            'Do it now',
-            'Shoot the prisoner\nor you are next'
+            'Pull the fucking trigger',
+            'Shoot the prisoner\nor you are next',
+            'You are disobeying\na direct order'
           ]
         }),
         new WaitAction(5),
+        new ReaderAction({
+          textObject: this.commandText,
+          lines: [
+            'Arrest him'
+          ]
+        }),
         {
           start: function () {
             this.gameState.onLose('You were executed for disobeying orders.');
@@ -143,6 +162,12 @@ Play.prototype = {
         }
       ]),
       'outOfBullets': new ActionList(this.game,[
+        {
+          start: function () {
+            this.gameState.showBadgeBlip('BIG SHOOTER');
+            this.actionList.next();
+          }
+        },
         new ReaderAction({
           textObject: this.commandText,
           lines: [
@@ -201,6 +226,7 @@ Play.prototype = {
     }
     this.actionLists.update();
     this.updateScoreboard();
+    this.updateAchievements();
   },
   updateScoreboard: function () {
     var ds = this.game.score - this.interpScore;
@@ -240,5 +266,33 @@ Play.prototype = {
   startNextLevel: function () {
     var nextId = this.levelId + 1;
     this.game.state.start('play', true, false, nextId)
+  },
+  findNextAchievementIndex: function () {
+    for (var i = 0; i < achievementList.length; i++) {
+      var achievement = achievementList[i];
+      if (achievement) {
+        var score = achievement[0];
+        if (score > this.game.score) {
+          return i;
+        }
+      }
+    }
+    return -1;
+  },
+  updateAchievements: function () {
+    var nextAchievement = achievementList[this.nextAchievementIndex];
+    if (nextAchievement) {
+      var score = nextAchievement[0];
+      var text = nextAchievement[1];
+      if (this.game.score >= score) {
+        this.showBadgeBlip(text);
+        this.nextAchievementIndex++;
+      }
+    }
+  },
+  showBadgeBlip: function (text) {
+    this.badgeBlips.addBlip(
+      this.game.width * 0.2, this.game.height * 0.85, text, 1000, 'dday', 32
+    );
   }
 };

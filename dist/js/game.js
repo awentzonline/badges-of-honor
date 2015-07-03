@@ -144,6 +144,58 @@ WaitAction.prototype = {
 },{}],5:[function(require,module,exports){
 'use strict';
 
+module.exports = BadgeBlips;
+
+function BadgeBlips() {
+  Phaser.Group.apply(this, arguments);
+}
+
+BadgeBlips.prototype = Object.create(Phaser.Group.prototype);
+BadgeBlips.prototype.constructor = BadgeBlips;
+
+BadgeBlips.prototype.addBlip = function(x, y, body, duration, font, size) {
+  var blip = this.getFirstExists(false);
+  if (blip) {
+    blip.revive();
+    blip.reset(x, y);
+    blip.bitmapText.text = body;
+    blip.alpha = 1.0;
+  } else {
+    blip = new BadgeBlip(this.game, x, y, font, size);
+    blip.bitmapText.text = body;
+    this.add(blip);
+  }
+  blip.scale.setTo(0.3, 0.3);
+  var scaleTween = this.game.add.tween(blip.scale).to(
+    {x:1.0, y:1.0}, 250, Phaser.Easing.Elastic.Out, true, 0
+  );
+  var tween = this.game.add.tween(blip.scale).to(
+    {x:0, y:0}, 250, Phaser.Easing.Elastic.In, false, duration
+  );
+  scaleTween.chain(tween);
+  tween.onComplete.add(function () {
+    blip.kill();
+  });
+};
+
+function BadgeBlip(game, x, y, font, size) {
+  Phaser.Sprite.call(this, game, x, y);
+  this.badge = this.game.add.sprite(0, 0, 'badge');
+  this.badge.anchor.setTo(0.5, 0.5);
+  this.badge.alpha = 0.8;
+  this.addChild(this.badge);
+  this.bitmapText = this.game.add.bitmapText(0, 0, font, '', size);
+  this.bitmapText.anchor.setTo(0.5, 0.7);
+  this.addChild(this.bitmapText);
+  this.anchor.setTo(0.5, 0.5);
+}
+
+BadgeBlip.prototype = Object.create(Phaser.Sprite.prototype);
+BadgeBlip.prototype.constructor = BadgeBlip;
+
+},{}],6:[function(require,module,exports){
+'use strict';
+
 module.exports = Blips;
 
 function Blips() {
@@ -174,7 +226,7 @@ Blips.prototype.addBlip = function(x, y, body, endX, endY, duration, font, size)
     blip.kill();
   });
 };
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 'use strict';
 
 module.exports = Bloodsplosion;
@@ -198,7 +250,7 @@ Bloodsplosion.prototype.burst = function (x, y) {
   this.bloodEmitter.start(true, 500, null, 3);
 };
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 'use strict';
 
 module.exports = Crosshair;
@@ -219,7 +271,7 @@ Crosshair.prototype.update = function () {
   }
 };
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 
 module.exports = Enemy;
 
@@ -240,7 +292,7 @@ function Enemy(game, x, y) {
 Enemy.prototype = Object.create(Phaser.Sprite.prototype);
 Enemy.prototype.constructor = Enemy;
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 'use strict';
 
 //global variables
@@ -248,6 +300,7 @@ window.onload = function () {
   var game = new Phaser.Game(400, 600, Phaser.AUTO, 'war-hero');
 
   // Game States
+  game.state.add('achievements', require('./states/achievements'));
   game.state.add('boot', require('./states/boot'));
   game.state.add('gameover', require('./states/gameover'));
   game.state.add('levels', require('./states/levels'));
@@ -258,7 +311,26 @@ window.onload = function () {
 
   game.state.start('boot');
 };
-},{"./states/boot":10,"./states/gameover":11,"./states/levels":12,"./states/menu":13,"./states/play":14,"./states/preload":15}],10:[function(require,module,exports){
+},{"./states/achievements":11,"./states/boot":12,"./states/gameover":13,"./states/levels":14,"./states/menu":15,"./states/play":16,"./states/preload":17}],11:[function(require,module,exports){
+'use strict';
+
+module.exports = [
+  [100, 'First\nBlood'],
+  [200, 'Second\nBlood'],
+  [300, 'Killing\n Spree'],
+  [500, 'Snakedick'],
+  [1000, 'President\n Loves You'],
+  [1300, 'REALLY GOOD'],
+  [1600, 'SO GOOD'],
+  [2000, 'YOU CAN BE\nANYTHING']
+  [2500, 'BEEFY KILLER'],
+  [3000, 'PRESIDENT\n BULLETS'],
+  [3300, 'Good Executor'],
+  [3500, 'EXTRAJUDICIAL!'],
+  [3700, 'I\'m so proud!']
+];
+
+},{}],12:[function(require,module,exports){
 
 'use strict';
 
@@ -288,7 +360,7 @@ Boot.prototype = {
 
 module.exports = Boot;
 
-},{}],11:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 
 'use strict';
 function GameOver() {}
@@ -322,7 +394,7 @@ GameOver.prototype = {
 };
 module.exports = GameOver;
 
-},{}],12:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 'use strict';
 
 module.exports = [
@@ -502,7 +574,7 @@ module.exports = [
   }
 ];
 
-},{}],13:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 'use strict';
 
 var Crosshair = require('../elements/crosshair');
@@ -538,10 +610,12 @@ Menu.prototype = {
 
 module.exports = Menu;
 
-},{"../elements/crosshair":7}],14:[function(require,module,exports){
+},{"../elements/crosshair":8}],16:[function(require,module,exports){
 'use strict';
 
 var _ = require('underscore');
+var achievementList = require('./achievements');
+var BadgeBlips = require('../elements/badgeblips');
 var Blips = require('../elements/blips');
 var Bloodsplosion = require('../elements/bloodsplosion');
 var Crosshair = require('../elements/crosshair');
@@ -561,6 +635,7 @@ Play.prototype = {
     this.levelId = levelId || 0;
     this.levelConfig = levelConfigs[this.levelId % levelConfigs.length];
     this.game.score = this.game.score || 0;
+    this.nextAchievementIndex = this.findNextAchievementIndex();
   },
   preload: function () {
     this.game.load.image('background', 'assets/' + this.levelConfig.background);
@@ -609,6 +684,9 @@ Play.prototype = {
     this.game.add.existing(this.crosshair);
     //
     this.createScripts();
+    //
+    this.badgeBlips = new BadgeBlips(this.game);
+    this.game.add.existing(this.badgeBlips);
   },
   createScripts: function () {
     this.actionLists = new ActionLists({
@@ -654,14 +732,27 @@ Play.prototype = {
         }
       ]),
       'hurryUp': new ActionList(this.game, [
+        {
+          start: function () {
+            this.gameState.showBadgeBlip('POTENTIAL\nPACIFIST')
+            this.actionList.next();
+          }
+        },
         new ReaderAction({
           textObject: this.commandText,
           lines: [
-            'Do it now',
-            'Shoot the prisoner\nor you are next'
+            'Pull the fucking trigger',
+            'Shoot the prisoner\nor you are next',
+            'You are disobeying\na direct order'
           ]
         }),
         new WaitAction(5),
+        new ReaderAction({
+          textObject: this.commandText,
+          lines: [
+            'Arrest him'
+          ]
+        }),
         {
           start: function () {
             this.gameState.onLose('You were executed for disobeying orders.');
@@ -684,6 +775,12 @@ Play.prototype = {
         }
       ]),
       'outOfBullets': new ActionList(this.game,[
+        {
+          start: function () {
+            this.gameState.showBadgeBlip('BIG SHOOTER');
+            this.actionList.next();
+          }
+        },
         new ReaderAction({
           textObject: this.commandText,
           lines: [
@@ -742,6 +839,7 @@ Play.prototype = {
     }
     this.actionLists.update();
     this.updateScoreboard();
+    this.updateAchievements();
   },
   updateScoreboard: function () {
     var ds = this.game.score - this.interpScore;
@@ -781,10 +879,38 @@ Play.prototype = {
   startNextLevel: function () {
     var nextId = this.levelId + 1;
     this.game.state.start('play', true, false, nextId)
+  },
+  findNextAchievementIndex: function () {
+    for (var i = 0; i < achievementList.length; i++) {
+      var achievement = achievementList[i];
+      if (achievement) {
+        var score = achievement[0];
+        if (score > this.game.score) {
+          return i;
+        }
+      }
+    }
+    return -1;
+  },
+  updateAchievements: function () {
+    var nextAchievement = achievementList[this.nextAchievementIndex];
+    if (nextAchievement) {
+      var score = nextAchievement[0];
+      var text = nextAchievement[1];
+      if (this.game.score >= score) {
+        this.showBadgeBlip(text);
+        this.nextAchievementIndex++;
+      }
+    }
+  },
+  showBadgeBlip: function (text) {
+    this.badgeBlips.addBlip(
+      this.game.width * 0.2, this.game.height * 0.85, text, 1000, 'dday', 32
+    );
   }
 };
 
-},{"../elements/actionlist":1,"../elements/actionlists":2,"../elements/actions/reader":3,"../elements/actions/wait":4,"../elements/blips":5,"../elements/bloodsplosion":6,"../elements/crosshair":7,"../elements/enemy":8,"./levels":12,"underscore":16}],15:[function(require,module,exports){
+},{"../elements/actionlist":1,"../elements/actionlists":2,"../elements/actions/reader":3,"../elements/actions/wait":4,"../elements/badgeblips":5,"../elements/blips":6,"../elements/bloodsplosion":7,"../elements/crosshair":8,"../elements/enemy":9,"./achievements":11,"./levels":14,"underscore":18}],17:[function(require,module,exports){
 'use strict';
 function Preload() {
   this.asset = null;
@@ -802,6 +928,7 @@ Preload.prototype = {
     this.load.image('crosshair', 'assets/crosshair.png');
     this.load.image('bloodsplat', 'assets/bloodsplat.png');
     this.load.image('m16ammo', 'assets/m16ammo.png');
+    this.load.image('badge', 'assets/badge.png');
     this.load.audio('shoot', ['assets/ar15.m4a', 'assets/ar15.ogg']);
     this.load.audio('hit', 'assets/hit.wav');
     this.game.load.bitmapFont('dday', 'assets/font.png', 'assets/font.fnt');
@@ -821,7 +948,7 @@ Preload.prototype = {
 
 module.exports = Preload;
 
-},{}],16:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 //     Underscore.js 1.8.3
 //     http://underscorejs.org
 //     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -2371,4 +2498,4 @@ module.exports = Preload;
   }
 }.call(this));
 
-},{}]},{},[9]);
+},{}]},{},[10]);
