@@ -22,7 +22,13 @@ Play.prototype = {
   },
   create: function() {
     this.background = this.game.add.sprite(0, 0, 'background');
-    
+    // splatter
+    this.bloodEmitter = this.game.add.emitter(0, 0, 100);
+    this.bloodEmitter.makeParticles('bloodsplat');
+    this.bloodEmitter.gravity = 600;
+    this.bloodEmitter.setAlpha(0.5, 0, 1000);
+    this.bloodEmitter.setRotation(0, 0);
+    // enemies
     this.enemyGroup = this.game.add.group();
     _.each(this.levelConfig.targets, function (conf) {
       var enemy = new Enemy(this.game, this.game.width * conf.x, this.game.height * conf.y)
@@ -146,6 +152,7 @@ Play.prototype = {
       }
       if (hitEnemy) {
         this.enemyShot(hitEnemy);
+        this.bloodBurst(pointer.x, pointer.y);
       }
       // if (!this.allowedToShoot) {
       //   this.onLose('You were executed for shooting too early.');
@@ -189,6 +196,11 @@ Play.prototype = {
     tween.onComplete.add(function () {
       blip.kill();
     });
+  },
+  bloodBurst: function (x, y) {
+    this.bloodEmitter.x = x;
+    this.bloodEmitter.y = y;
+    this.bloodEmitter.start(true, 500, null, 3);
   },
   onWin: function () {
     this.winTriggered = true;
