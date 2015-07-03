@@ -117,7 +117,7 @@ Play.prototype = {
           textObject: this.commandText,
           lines: [
             'Do it now',
-            'Shoot the prisoner or you\'re next'
+            'Shoot the prisoner\nor you are next'
           ]
         }),
         new WaitAction(5),
