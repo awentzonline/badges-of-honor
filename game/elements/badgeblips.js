@@ -38,7 +38,7 @@ function BadgeBlip(game, x, y, font, size) {
   Phaser.Sprite.call(this, game, x, y);
   this.badge = this.game.add.sprite(0, 0, 'badge');
   this.badge.anchor.setTo(0.5, 0.5);
-  this.badge.alpha = 0.8;
+  this.badge.alpha = 0.9;
   this.addChild(this.badge);
   this.bitmapText = this.game.add.bitmapText(0, 0, font, '', size);
   this.bitmapText.anchor.setTo(0.5, 0.7);

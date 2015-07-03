@@ -121,7 +121,7 @@ Play.prototype = {
       'hurryUp': new ActionList(this.game, [
         {
           start: function () {
-            this.gameState.showBadgeBlip('POTENTIAL\nPACIFIST')
+            this.gameState.showBadgeBlip('POTENTIAL\n PACIFIST')
             this.actionList.next();
           }
         },
@@ -164,7 +164,7 @@ Play.prototype = {
       'outOfBullets': new ActionList(this.game,[
         {
           start: function () {
-            this.gameState.showBadgeBlip('BIG SHOOTER');
+            this.gameState.showBadgeBlip(' WASTER OF\nTAX DOLLARS');
             this.actionList.next();
           }
         },
@@ -292,7 +292,7 @@ Play.prototype = {
   },
   showBadgeBlip: function (text) {
     this.badgeBlips.addBlip(
-      this.game.width * 0.2, this.game.height * 0.85, text, 1000, 'dday', 32
+      this.game.width * 0.25, this.game.height * 0.85, text, 1000, 'dday', 36
     );
   }
 };

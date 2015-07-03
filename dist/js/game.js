@@ -182,7 +182,7 @@ function BadgeBlip(game, x, y, font, size) {
   Phaser.Sprite.call(this, game, x, y);
   this.badge = this.game.add.sprite(0, 0, 'badge');
   this.badge.anchor.setTo(0.5, 0.5);
-  this.badge.alpha = 0.8;
+  this.badge.alpha = 0.9;
   this.addChild(this.badge);
   this.bitmapText = this.game.add.bitmapText(0, 0, font, '', size);
   this.bitmapText.anchor.setTo(0.5, 0.7);
@@ -315,19 +315,28 @@ window.onload = function () {
 'use strict';
 
 module.exports = [
-  [100, 'First\nBlood'],
-  [200, 'Second\nBlood'],
+  [100, ' First\nBlood'],
+  [200, 'Second\n Blood'],
   [300, 'Killing\n Spree'],
-  [500, 'Snakedick'],
-  [1000, 'President\n Loves You'],
-  [1300, 'REALLY GOOD'],
-  [1600, 'SO GOOD'],
-  [2000, 'YOU CAN BE\nANYTHING']
-  [2500, 'BEEFY KILLER'],
-  [3000, 'PRESIDENT\n BULLETS'],
-  [3300, 'Good Executor'],
-  [3500, 'EXTRAJUDICIAL!'],
-  [3700, 'I\'m so proud!']
+  [500, '   Total\nSnakedick'],
+  [1000, 'The President\n   Loves You'],
+  [1500, 'REALLY GOOD'],
+  [2000, 'SO GOOD'],
+  [2500, 'YOU CAN BE\nANYTHING']
+  [3000, 'BEEFY KILLER'],
+  [4500, ' PRESIDENT\n OF BULLETS'],
+  [5000, 'Good Executor'],
+  [5500, 'EXTRAJUDICIAL!'],
+  [6000, 'Tremendous\ngun shooting'],
+  [6500, 'I\'m very proud of you'],
+  [6000, ' SHARP\nSHOOTER'],
+  [7500, '  BEST\nSHOOTER'],
+  [8000, ' PROMOTED TO\nSENIOR SHOOTER'],
+  [8500, 'INCREDIBEAST'],
+  [8000, 'Unbelievable'],
+  [9500, 'VERY PRESIDENTIAL'],
+  [9000, 'Kill Guy'],
+  [10000, 'Gun Operator']
 ];
 
 },{}],12:[function(require,module,exports){
@@ -373,15 +382,18 @@ GameOver.prototype = {
 
   },
   create: function () {
-    var style = { font: '45px Arial', fill: '#ffffff', align: 'center'};
-    this.titleText = this.game.add.text(this.game.world.centerX,100, 'Executed!', style);
+    this.titleText = this.game.add.bitmapText(this.game.world.centerX, 100, 'dday', 'Executed!', 64);
     this.titleText.anchor.setTo(0.5, 0.5);
 
     if (this.reason) {
-      this.congratsText = this.game.add.text(this.game.world.centerX, 200, this.reason, { font: '16px Arial', fill: '#ffffff', align: 'left'});
+      this.congratsText = this.game.add.bitmapText(
+        this.game.world.centerX, 200, 'dday', this.reason, 24
+      );
       this.congratsText.anchor.setTo(0.5, 0.5);
     }
-    this.instructionText = this.game.add.text(this.game.world.centerX, 300, 'Click To Play Again', { font: '16px Arial', fill: '#ffffff', align: 'center'});
+    this.instructionText = this.game.add.bitmapText(
+      this.game.world.centerX, 300, 'dday', 'Click To Re-enlist', 32
+    );
     this.instructionText.anchor.setTo(0.5, 0.5);
 
     this.game.score = 0;
@@ -587,12 +599,12 @@ Menu.prototype = {
   },
   create: function() {
     this.titleText = this.game.add.bitmapText(
-      this.game.world.centerX, 300, 'dday', 'War Hero\nThe Game!', 64
+      this.game.world.centerX, 300, 'dday', 'Badges of Honor', 64
     );
     this.titleText.anchor.setTo(0.5, 0.5);
 
     this.instructionsText = this.game.add.bitmapText(
-      this.game.world.centerX, 400, 'dday', 'Click to play', 28
+      this.game.world.centerX, 400, 'dday', 'Click to enlist', 28
     );
     this.instructionsText.anchor.setTo(0.5, 0.5);
 
@@ -734,7 +746,7 @@ Play.prototype = {
       'hurryUp': new ActionList(this.game, [
         {
           start: function () {
-            this.gameState.showBadgeBlip('POTENTIAL\nPACIFIST')
+            this.gameState.showBadgeBlip('POTENTIAL\n PACIFIST')
             this.actionList.next();
           }
         },
@@ -777,7 +789,7 @@ Play.prototype = {
       'outOfBullets': new ActionList(this.game,[
         {
           start: function () {
-            this.gameState.showBadgeBlip('BIG SHOOTER');
+            this.gameState.showBadgeBlip(' WASTER OF\nTAX DOLLARS');
             this.actionList.next();
           }
         },
@@ -905,7 +917,7 @@ Play.prototype = {
   },
   showBadgeBlip: function (text) {
     this.badgeBlips.addBlip(
-      this.game.width * 0.2, this.game.height * 0.85, text, 1000, 'dday', 32
+      this.game.width * 0.25, this.game.height * 0.85, text, 1000, 'dday', 36
     );
   }
 };

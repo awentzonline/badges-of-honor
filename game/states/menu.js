@@ -10,12 +10,12 @@ Menu.prototype = {
   },
   create: function() {
     this.titleText = this.game.add.bitmapText(
-      this.game.world.centerX, 300, 'dday', 'War Hero\nThe Game!', 64
+      this.game.world.centerX, 300, 'dday', 'Badges of Honor', 64
     );
     this.titleText.anchor.setTo(0.5, 0.5);
 
     this.instructionsText = this.game.add.bitmapText(
-      this.game.world.centerX, 400, 'dday', 'Click to play', 28
+      this.game.world.centerX, 400, 'dday', 'Click to enlist', 28
     );
     this.instructionsText.anchor.setTo(0.5, 0.5);
 
