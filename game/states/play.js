@@ -74,6 +74,9 @@ Play.prototype = {
     //
     this.badgeBlips = new BadgeBlips(this.game);
     this.game.add.existing(this.badgeBlips);
+    if (this.levelId == 0) {
+      this.showBadgeBlip('Enlistment\n   Bonus')
+    }
   },
   createScripts: function () {
     this.actionLists = new ActionLists({
@@ -292,7 +295,7 @@ Play.prototype = {
   },
   showBadgeBlip: function (text) {
     this.badgeBlips.addBlip(
-      this.game.width * 0.25, this.game.height * 0.85, text, 1000, 'dday', 36
+      this.game.width * 0.275, this.game.height * 0.85, text, 1000, 'dday', 42
     );
   }
 };

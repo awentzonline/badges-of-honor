@@ -2,7 +2,7 @@
 
 //global variables
 window.onload = function () {
-  var game = new Phaser.Game(400, 600, Phaser.AUTO, 'war-hero');
+  var game = new Phaser.Game(400, 600, Phaser.AUTO, 'badges-of-honor');
 
   // Game States
   game.state.add('achievements', require('./states/achievements'));

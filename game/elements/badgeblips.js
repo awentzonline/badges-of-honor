@@ -26,7 +26,7 @@ BadgeBlips.prototype.addBlip = function(x, y, body, duration, font, size) {
     {x:1.0, y:1.0}, 250, Phaser.Easing.Elastic.Out, true, 0
   );
   var tween = this.game.add.tween(blip.scale).to(
-    {x:0, y:0}, 250, Phaser.Easing.Elastic.In, false, duration
+    {y:0}, 250, Phaser.Easing.Elastic.In, false, duration
   );
   scaleTween.chain(tween);
   tween.onComplete.add(function () {
