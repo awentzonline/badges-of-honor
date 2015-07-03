@@ -294,6 +294,7 @@ Play.prototype = {
     }
   },
   showBadgeBlip: function (text) {
+    this.game.sound.play('achievement', 0.5);
     this.badgeBlips.addBlip(
       this.game.width * 0.275, this.game.height * 0.85, text, 1000, 'dday', 42
     );

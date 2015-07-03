@@ -326,7 +326,7 @@ module.exports = [
   [3000, 'True Patriot'],
   [3500, ' Senatorial\nEagle Prize'],
   [4000, ' 25%\nRaise'],
-  [4500, 'President\n of the army'],
+  [4500, 'President\nof the army'],
   [5000, '   Good\nExecutor'],
   [5500, 'EXTRAJUDICIAL!'],
   [6000, ' Tremendous\ngun shooting'],
@@ -340,15 +340,15 @@ module.exports = [
   [10000, '   Total\nSnakedick'],
   [10500, '     35%\nCommission'],
   [11000, 'SUPER SOLDIER'],
-  [11500, 'Real good\nSOLDIER'],
+  [11500, 'Real good\n  SOLDIER'],
   [12000, 'ADMIRAL'],
-  [12500, 'PROMOTED TO\nBIG GENERAL'],
+  [12500, 'PROMOTED TO\n BIG GENERAL'],
   [13000, ' Extremely\nPresidential'],
   [13500, 'True Detective'],
   [14000, 'Cost of living\n Adjustment'],
   [14500, ' You are\nthe flag'],
   [15000, 'Found $20'],
-  [15500, '   Wife\nImpressed']
+  [15500, ' Wife is\nImpressed']
 ];
 
 },{}],12:[function(require,module,exports){
@@ -931,6 +931,7 @@ Play.prototype = {
     }
   },
   showBadgeBlip: function (text) {
+    this.game.sound.play('achievement', 0.5);
     this.badgeBlips.addBlip(
       this.game.width * 0.275, this.game.height * 0.85, text, 1000, 'dday', 42
     );
@@ -958,6 +959,7 @@ Preload.prototype = {
     this.load.image('badge', 'assets/badge.png');
     this.load.audio('shoot', ['assets/ar15.m4a', 'assets/ar15.ogg']);
     this.load.audio('hit', 'assets/hit.wav');
+    this.load.audio('achievement', 'assets/achievement.wav');
     this.game.load.bitmapFont('dday', 'assets/font.png', 'assets/font.fnt');
   },
   create: function() {
