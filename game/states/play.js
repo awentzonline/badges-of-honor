@@ -1,13 +1,13 @@
 'use strict';
 
 var _ = require('underscore');
-var achievementList = require('./achievements');
+var achievementList = require('../boh/achievements');
 var BadgeBlips = require('../elements/badgeblips');
 var Blips = require('../elements/blips');
 var Bloodsplosion = require('../elements/bloodsplosion');
 var Crosshair = require('../elements/crosshair');
 var Enemy = require('../elements/enemy');
-var levelConfigs = require('./levels');
+var levelConfigs = require('../boh/levels');
 var ActionList = require('../elements/actionlist');
 var ActionLists = require('../elements/actionlists');
 var ReaderAction = require('../elements/actions/reader');
