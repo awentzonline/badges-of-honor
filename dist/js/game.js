@@ -390,6 +390,7 @@ Play.prototype = {
     this.crosshair.anchor.setTo(0.5, 0.5);
     this.shotCountdown = 0;
     this.shotDelay = 0.2;
+    this.shootSound = this.game.add.audio('shoot');
     //
     this.scoreBlips = this.game.add.group();
     //
@@ -483,7 +484,8 @@ Play.prototype = {
     this.crosshair.position.setTo(pointer.x, pointer.y);
     this.shotCountdown -= dt;
     if (this.shotCountdown <= 0 && pointer.isDown) {
-      this.game.sound.play('shoot', 1.0, false, true);
+      //this.game.sound.play('shoot', 1.0, false, true);
+      this.shootSound.play();
       this.shotCountdown = this.shotDelay;
       var hitEnemy;
       // enemies are sorted back to front
