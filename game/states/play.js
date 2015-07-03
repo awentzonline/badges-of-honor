@@ -3,6 +3,7 @@
 var _ = require('underscore');
 var Blips = require('../elements/blips');
 var Bloodsplosion = require('../elements/bloodsplosion');
+var Crosshair = require('../elements/crosshair');
 var Enemy = require('../elements/enemy');
 var levelConfigs = require('./levels');
 var ActionList = require('../elements/actionlist');
@@ -38,8 +39,6 @@ Play.prototype = {
     }.bind(this));
     this.enemyGroup.sort('y', Phaser.Group.SORT_ASCENDING); // higher up is farther back
     //
-    this.crosshair = this.game.add.sprite(0, 0, 'crosshair');
-    this.crosshair.anchor.setTo(0.5, 0.5);
     this.shotCountdown = 0;
     this.shotDelay = 0.2;
     this.shootSound = this.game.add.audio('shoot');
@@ -49,20 +48,15 @@ Play.prototype = {
     //
     this.winTriggered = false;
     //
-    this.commandText = this.game.add.text(this.game.width * 0.5, this.game.height * 0.2, '', {
-      font: '24px Arial',
-      fill: 'white',
-      align: 'center'
-    });
+    this.commandText = this.game.add.bitmapText(this.game.width * 0.5, this.game.height * 0.2, 'dday', '', 36);
     this.commandText.anchor.setTo(0.5, 0);
-    //
+    // score
     this.interpScore = this.game.score;
-    this.scoreText = this.game.add.text(this.game.width * 0.5, this.game.height * 0.1, this.interpScore, {
-      font: '42px Arial',
-      fill: 'white',
-      align: 'center'
-    });
+    this.scoreText = this.game.add.bitmapText(this.game.width * 0.5, this.game.height * 0.1, 'dday', '' + this.interpScore, 42);
     this.scoreText.anchor.setTo(0.5, 0.5);
+    //
+    this.crosshair = new Crosshair(this.game, 0, 0);
+    this.game.add.existing(this.crosshair);
     //
     this.createScripts();
   },
@@ -142,8 +136,6 @@ Play.prototype = {
   update: function() {
     var dt = this.game.time.physicsElapsed;
     var pointer = this.game.input.activePointer;
-
-    this.crosshair.position.setTo(pointer.x, pointer.y);
     this.shotCountdown -= dt;
     if (this.shotCountdown <= 0 && pointer.isDown) {
       //this.game.sound.play('shoot', 1.0, false, true);
@@ -177,7 +169,7 @@ Play.prototype = {
     if (Math.abs(ds) > 0) {
       this.interpScore += Math.max(1, ds * 0.2);
       this.interpScore = Math.min(this.interpScore, this.game.score);
-      this.scoreText.text = Math.floor(this.interpScore);
+      this.scoreText.text = '' + Math.floor(this.interpScore);
     }
   },
   enemyShot: function(enemy) {
@@ -192,8 +184,10 @@ Play.prototype = {
     var scoreValue = 100;
     this.game.score += scoreValue;
     this.scoreBlips.addBlip(
-      enemy.x, enemy.y - enemy.height * enemy.anchor.y, '+' + scoreValue, undefined,
-      this.game.width * 0.5, this.scoreText.y
+      enemy.x, enemy.y - enemy.height * enemy.anchor.y,
+      '+' + scoreValue,
+      this.game.width * 0.5, this.scoreText.y,
+      750, 'dday', 36
     );
   },
   onWin: function () {

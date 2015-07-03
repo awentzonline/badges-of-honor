@@ -1,5 +1,7 @@
-
 'use strict';
+
+var Crosshair = require('../elements/crosshair');
+
 function Menu() {}
 
 Menu.prototype = {
@@ -14,14 +16,12 @@ Menu.prototype = {
     this.instructionsText = this.game.add.text(this.game.world.centerX, 400, 'Click to play', { font: '16px Arial', fill: '#ffffff', align: 'center'});
     this.instructionsText.anchor.setTo(0.5, 0.5);
 
-    this.crosshair = this.game.add.sprite(0, 0, 'crosshair');
-    this.crosshair.anchor.setTo(0.5, 0.5);
-    
+    this.crosshair = new Crosshair(this.game, 0, 0);
+    this.game.add.existing(this.crosshair);
   },
   update: function() {
     var pointer = this.game.input.activePointer;
-    this.crosshair.position.setTo(pointer.x, pointer.y);
-    if(this.game.input.activePointer.justPressed()) {
+    if(pointer && pointer.justPressed()) {
       this.game.state.start('play', true, false, 0);
     }
   }

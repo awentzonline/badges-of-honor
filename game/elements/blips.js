@@ -9,13 +9,8 @@ function Blips() {
 Blips.prototype = Object.create(Phaser.Group.prototype);
 Blips.prototype.constructor = Blips;
 
-Blips.prototype.addBlip = function(x, y, body, style, endX, endY, duration) {
+Blips.prototype.addBlip = function(x, y, body, endX, endY, duration, font, size) {
   var blip = this.getFirstExists(false);
-  style = style || {
-    font: '32px Arial',
-    fill: 'white',
-    align: 'center'
-  };
   endX = endX === undefined ? x : endX;
   endY = endY === undefined ? 0 : endY;
   if (blip) {
@@ -24,7 +19,7 @@ Blips.prototype.addBlip = function(x, y, body, style, endX, endY, duration) {
     blip.text = body;
     blip.alpha = 1.0;
   } else {
-    blip = this.game.add.text(x, y, body, style);
+    blip = this.game.add.bitmapText(x, y, font, body, size);
     blip.anchor.setTo(0.5, 0.7);
     this.add(blip);
   }
