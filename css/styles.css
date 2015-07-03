@@ -2,9 +2,10 @@ body {
   background-color: black;
 }
 
-#solider-shooter {
-  border: 1px solid #444;
+#war-hero {
   margin-left: auto;
   margin-right: auto;
+  min-width: 320px;
+  max-width: 400px;
   cursor: none;
 }

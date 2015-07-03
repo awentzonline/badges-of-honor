@@ -42,7 +42,7 @@ Play.prototype = {
     this.crosshair = this.game.add.sprite(0, 0, 'crosshair');
     this.crosshair.anchor.setTo(0.5, 0.5);
     this.shotCountdown = 0;
-    this.shotDelay = 0.1;
+    this.shotDelay = 0.2;
     //
     this.scoreBlips = this.game.add.group();
     //
@@ -91,13 +91,13 @@ Play.prototype = {
           textObject: this.commandText,
           randomLines: [
             [
-              'Woooo yeah!'
+              'You deserve a promotion!'
             ],
             [
               'Nice shot!'
             ],
             [
-              'Get some, motherfuckers!'
+              'What a shot!'
             ]
           ]
         }),
@@ -187,11 +187,11 @@ Play.prototype = {
         fill: 'white',
         align: 'center'
       });
-      blip.anchor.setTo(0.5, 0.5);
+      blip.anchor.setTo(0.5, 0.7);
       this.scoreBlips.add(blip);
     }
     var tween = this.game.add.tween(blip).to(
-      {alpha: 0, y: y - 50}, 750, Phaser.Easing.Cubic.In, true, 0
+      {alpha: 0, y: y - 100}, 1000, Phaser.Easing.Cubic.In, true, 0
     )
     tween.onComplete.add(function () {
       blip.kill();
