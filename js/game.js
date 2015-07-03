@@ -153,13 +153,8 @@ function Blips() {
 Blips.prototype = Object.create(Phaser.Group.prototype);
 Blips.prototype.constructor = Blips;
 
-Blips.prototype.addBlip = function(x, y, body, style, endX, endY, duration) {
+Blips.prototype.addBlip = function(x, y, body, endX, endY, duration, font, size) {
   var blip = this.getFirstExists(false);
-  style = style || {
-    font: '32px Arial',
-    fill: 'white',
-    align: 'center'
-  };
   endX = endX === undefined ? x : endX;
   endY = endY === undefined ? 0 : endY;
   if (blip) {
@@ -168,7 +163,7 @@ Blips.prototype.addBlip = function(x, y, body, style, endX, endY, duration) {
     blip.text = body;
     blip.alpha = 1.0;
   } else {
-    blip = this.game.add.text(x, y, body, style);
+    blip = this.game.add.bitmapText(x, y, font, body, size);
     blip.anchor.setTo(0.5, 0.7);
     this.add(blip);
   }
@@ -204,6 +199,27 @@ Bloodsplosion.prototype.burst = function (x, y) {
 };
 
 },{}],7:[function(require,module,exports){
+'use strict';
+
+module.exports = Crosshair;
+
+function Crosshair(game, x, y) {
+  Phaser.Sprite.call(this, game, x, y, 'crosshair');
+  this.anchor.setTo(0.5, 0.5);  
+}
+
+Crosshair.prototype = Object.create(Phaser.Sprite.prototype);
+Crosshair.prototype.constructor = Crosshair;
+
+Crosshair.prototype.update = function () {
+  Phaser.Sprite.prototype.update.call(this);
+  var pointer = this.game.input.activePointer;
+  if (pointer.withinGame) {
+    this.position.setTo(pointer.x, pointer.y);
+  }
+};
+
+},{}],8:[function(require,module,exports){
 
 module.exports = Enemy;
 
@@ -213,7 +229,7 @@ function Enemy(game, x, y) {
   this.animations.add('idle', [0]);
   var deathAnim = this.animations.add('die', [1,2,3,4,5,6,7,8,9,10,11,12,13]);
   deathAnim.onComplete.add(function () {
-    game.sound.play('hit', 1.0, false);
+    game.sound.play('hit', 0.25, false);
     this.kill();
     this.visible = true;
     this.exists = true;
@@ -224,7 +240,7 @@ function Enemy(game, x, y) {
 Enemy.prototype = Object.create(Phaser.Sprite.prototype);
 Enemy.prototype.constructor = Enemy;
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 'use strict';
 
 //global variables
@@ -242,7 +258,7 @@ window.onload = function () {
 
   game.state.start('boot');
 };
-},{"./states/boot":9,"./states/gameover":10,"./states/levels":11,"./states/menu":12,"./states/play":13,"./states/preload":14}],9:[function(require,module,exports){
+},{"./states/boot":10,"./states/gameover":11,"./states/levels":12,"./states/menu":13,"./states/play":14,"./states/preload":15}],10:[function(require,module,exports){
 
 'use strict';
 
@@ -272,7 +288,7 @@ Boot.prototype = {
 
 module.exports = Boot;
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 
 'use strict';
 function GameOver() {}
@@ -306,7 +322,7 @@ GameOver.prototype = {
 };
 module.exports = GameOver;
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 'use strict';
 
 module.exports = [
@@ -486,9 +502,11 @@ module.exports = [
   }
 ];
 
-},{}],12:[function(require,module,exports){
-
+},{}],13:[function(require,module,exports){
 'use strict';
+
+var Crosshair = require('../elements/crosshair');
+
 function Menu() {}
 
 Menu.prototype = {
@@ -503,14 +521,12 @@ Menu.prototype = {
     this.instructionsText = this.game.add.text(this.game.world.centerX, 400, 'Click to play', { font: '16px Arial', fill: '#ffffff', align: 'center'});
     this.instructionsText.anchor.setTo(0.5, 0.5);
 
-    this.crosshair = this.game.add.sprite(0, 0, 'crosshair');
-    this.crosshair.anchor.setTo(0.5, 0.5);
-    
+    this.crosshair = new Crosshair(this.game, 0, 0);
+    this.game.add.existing(this.crosshair);
   },
   update: function() {
     var pointer = this.game.input.activePointer;
-    this.crosshair.position.setTo(pointer.x, pointer.y);
-    if(this.game.input.activePointer.justPressed()) {
+    if(pointer && pointer.justPressed()) {
       this.game.state.start('play', true, false, 0);
     }
   }
@@ -518,12 +534,13 @@ Menu.prototype = {
 
 module.exports = Menu;
 
-},{}],13:[function(require,module,exports){
+},{"../elements/crosshair":7}],14:[function(require,module,exports){
 'use strict';
 
 var _ = require('underscore');
 var Blips = require('../elements/blips');
 var Bloodsplosion = require('../elements/bloodsplosion');
+var Crosshair = require('../elements/crosshair');
 var Enemy = require('../elements/enemy');
 var levelConfigs = require('./levels');
 var ActionList = require('../elements/actionlist');
@@ -559,8 +576,6 @@ Play.prototype = {
     }.bind(this));
     this.enemyGroup.sort('y', Phaser.Group.SORT_ASCENDING); // higher up is farther back
     //
-    this.crosshair = this.game.add.sprite(0, 0, 'crosshair');
-    this.crosshair.anchor.setTo(0.5, 0.5);
     this.shotCountdown = 0;
     this.shotDelay = 0.2;
     this.shootSound = this.game.add.audio('shoot');
@@ -570,20 +585,15 @@ Play.prototype = {
     //
     this.winTriggered = false;
     //
-    this.commandText = this.game.add.text(this.game.width * 0.5, this.game.height * 0.2, '', {
-      font: '24px Arial',
-      fill: 'white',
-      align: 'center'
-    });
+    this.commandText = this.game.add.bitmapText(this.game.width * 0.5, this.game.height * 0.2, 'dday', '', 36);
     this.commandText.anchor.setTo(0.5, 0);
-    //
+    // score
     this.interpScore = this.game.score;
-    this.scoreText = this.game.add.text(this.game.width * 0.5, this.game.height * 0.1, this.interpScore, {
-      font: '42px Arial',
-      fill: 'white',
-      align: 'center'
-    });
+    this.scoreText = this.game.add.bitmapText(this.game.width * 0.5, this.game.height * 0.1, 'dday', '' + this.interpScore, 42);
     this.scoreText.anchor.setTo(0.5, 0.5);
+    //
+    this.crosshair = new Crosshair(this.game, 0, 0);
+    this.game.add.existing(this.crosshair);
     //
     this.createScripts();
   },
@@ -663,8 +673,6 @@ Play.prototype = {
   update: function() {
     var dt = this.game.time.physicsElapsed;
     var pointer = this.game.input.activePointer;
-
-    this.crosshair.position.setTo(pointer.x, pointer.y);
     this.shotCountdown -= dt;
     if (this.shotCountdown <= 0 && pointer.isDown) {
       //this.game.sound.play('shoot', 1.0, false, true);
@@ -698,7 +706,7 @@ Play.prototype = {
     if (Math.abs(ds) > 0) {
       this.interpScore += Math.max(1, ds * 0.2);
       this.interpScore = Math.min(this.interpScore, this.game.score);
-      this.scoreText.text = Math.floor(this.interpScore);
+      this.scoreText.text = '' + Math.floor(this.interpScore);
     }
   },
   enemyShot: function(enemy) {
@@ -713,8 +721,10 @@ Play.prototype = {
     var scoreValue = 100;
     this.game.score += scoreValue;
     this.scoreBlips.addBlip(
-      enemy.x, enemy.y - enemy.height * enemy.anchor.y, '+' + scoreValue, undefined,
-      this.game.width * 0.5, this.scoreText.y
+      enemy.x, enemy.y - enemy.height * enemy.anchor.y,
+      '+' + scoreValue,
+      this.game.width * 0.5, this.scoreText.y,
+      750, 'dday', 36
     );
   },
   onWin: function () {
@@ -732,7 +742,7 @@ Play.prototype = {
   }
 };
 
-},{"../elements/actionlist":1,"../elements/actionlists":2,"../elements/actions/reader":3,"../elements/actions/wait":4,"../elements/blips":5,"../elements/bloodsplosion":6,"../elements/enemy":7,"./levels":11,"underscore":15}],14:[function(require,module,exports){
+},{"../elements/actionlist":1,"../elements/actionlists":2,"../elements/actions/reader":3,"../elements/actions/wait":4,"../elements/blips":5,"../elements/bloodsplosion":6,"../elements/crosshair":7,"../elements/enemy":8,"./levels":12,"underscore":16}],15:[function(require,module,exports){
 'use strict';
 function Preload() {
   this.asset = null;
@@ -751,6 +761,7 @@ Preload.prototype = {
     this.load.image('bloodsplat', 'assets/bloodsplat.png');
     this.load.audio('shoot', ['assets/ar15.m4a', 'assets/ar15.ogg']);
     this.load.audio('hit', 'assets/hit.wav');
+    this.game.load.bitmapFont('dday', 'assets/font.png', 'assets/font.fnt');
   },
   create: function() {
     this.asset.cropEnabled = false;
@@ -767,7 +778,7 @@ Preload.prototype = {
 
 module.exports = Preload;
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 //     Underscore.js 1.8.3
 //     http://underscorejs.org
 //     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -2317,4 +2328,4 @@ module.exports = Preload;
   }
 }.call(this));
 
-},{}]},{},[8]);
+},{}]},{},[9]);
