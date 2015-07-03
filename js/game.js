@@ -1,319 +1,6 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
-module.exports = ActionList;
-
-function ActionList(game, actions) {
-  this.game = game;
-  this.actions = actions;
-  this.action = null;
-  this.actionIndex = -1;
-}
-
-ActionList.prototype = {
-  update: function () {
-    if (this.action && this.action.update) {
-      this.action.update();
-    }
-  },
-  start: function () {
-    this.actionIndex = -1;
-    this.next();
-  },
-  stop: function () {
-    if (this.action && this.action.stop) {
-      this.action.stop();
-    }
-  },
-  next: function () {
-    if (this.action && this.action.stop) {
-      this.action.stop();
-    }
-    this.actionIndex++;
-    this.action = this.actions[this.actionIndex];
-    if (this.action) {
-      this.action.game = this.game;  // I'm lazy
-      this.action.gameState = this.game.state.states[this.game.state.current];
-      this.action.actionList = this;
-      if (this.action.start) {
-        this.action.start();
-      }
-    }
-  }
-
-};
-
-},{}],2:[function(require,module,exports){
-'use strict';
-
-module.exports = ActionLists;
-
-function ActionLists(actionLists) {
-  this.actionLists = actionLists;
-  this.actionList = null;
-}
-
-ActionLists.prototype = {
-  start: function (name) {
-    if (this.actionList) {
-      this.actionList.stop();
-    }
-    this.actionList = this.actionLists[name];
-    this.actionList.start();
-  },
-  stop: function (name) {
-    if (this.actionList) {
-      this.actionList.stop();
-    }
-  },
-  update: function () {
-    if (this.actionList) {
-      this.actionList.update();
-    }
-  }
-};
-
-},{}],3:[function(require,module,exports){
-'use strict';
-
-module.exports = ReaderAction;
-
-function ReaderAction(options) {
-  this.textObject = options.textObject;
-  this.randomLines = options.randomLines;
-  this.lines = options.lines;
-  this.displayTime = options.displayTime || 1000;
-  this.hideTime = options.hideTime || 500;
-}
-
-ReaderAction.prototype = {
-  start: function () {
-    this.lineIndex = -1;
-    this.tween = null;
-    this.textObject.alpha = 0.0;
-    if (this.randomLines) {
-      this.lines = this.randomLines[Math.floor(Math.random() * this.randomLines.length)];
-    }
-    this.nextText();
-  },
-  nextText: function () {
-    this.lineIndex++;
-    if (this.lines.length <= this.lineIndex) {
-      this.actionList.next();
-      return;
-    }
-    var line = this.lines[this.lineIndex];
-    this.textObject.text = line;
-    this.tween = this.game.add.tween(this.textObject).to({alpha: 1.0}, this.hideTime, Phaser.Easing.Linear.None, true);
-    this.tween.onComplete.addOnce(function () {
-      this.tween = this.game.add.tween(this.textObject).to({alpha: 0.0}, this.hideTime, Phaser.Easing.Linear.None, true, this.displayTime);
-      this.tween.onComplete.addOnce(function () {
-        this.nextText();
-      }, this);
-    }, this);
-  },
-  stop: function () {
-    if (this.tween) {
-      this.tween.stop();
-      this.game.tweens.remove(this.tween);
-      this.tween = null;
-    }
-  }
-}
-},{}],4:[function(require,module,exports){
-'use strict';
-
-module.exports = WaitAction;
-
-function WaitAction(time) {
-  this.time = time;
-}
-
-WaitAction.prototype = {
-  start: function () {
-    this.countdown = this.time;
-  },
-  update: function () {
-    this.countdown -= this.game.time.physicsElapsed;
-    if (this.countdown <= 0) {
-      this.actionList.next();
-    }
-  }
-};
-
-},{}],5:[function(require,module,exports){
-'use strict';
-
-module.exports = BadgeBlips;
-
-function BadgeBlips() {
-  Phaser.Group.apply(this, arguments);
-}
-
-BadgeBlips.prototype = Object.create(Phaser.Group.prototype);
-BadgeBlips.prototype.constructor = BadgeBlips;
-
-BadgeBlips.prototype.addBlip = function(x, y, body, duration, font, size) {
-  var blip = this.getFirstExists(false);
-  if (blip) {
-    blip.revive();
-    blip.reset(x, y);
-    blip.bitmapText.text = body;
-    blip.alpha = 1.0;
-  } else {
-    blip = new BadgeBlip(this.game, x, y, font, size);
-    blip.bitmapText.text = body;
-    this.add(blip);
-  }
-  blip.scale.setTo(0.3, 0.3);
-  var scaleTween = this.game.add.tween(blip.scale).to(
-    {x:1.0, y:1.0}, 250, Phaser.Easing.Elastic.Out, true, 0
-  );
-  var tween = this.game.add.tween(blip.scale).to(
-    {y:0}, 250, Phaser.Easing.Elastic.In, false, duration
-  );
-  scaleTween.chain(tween);
-  tween.onComplete.add(function () {
-    blip.kill();
-  });
-};
-
-function BadgeBlip(game, x, y, font, size) {
-  Phaser.Sprite.call(this, game, x, y);
-  this.badge = this.game.add.sprite(0, 0, 'badge');
-  this.badge.anchor.setTo(0.5, 0.5);
-  this.badge.alpha = 0.9;
-  this.addChild(this.badge);
-  this.bitmapText = this.game.add.bitmapText(0, 0, font, '', size);
-  this.bitmapText.anchor.setTo(0.5, 0.7);
-  this.addChild(this.bitmapText);
-  this.anchor.setTo(0.5, 0.5);
-}
-
-BadgeBlip.prototype = Object.create(Phaser.Sprite.prototype);
-BadgeBlip.prototype.constructor = BadgeBlip;
-
-},{}],6:[function(require,module,exports){
-'use strict';
-
-module.exports = Blips;
-
-function Blips() {
-  Phaser.Group.apply(this, arguments);
-}
-
-Blips.prototype = Object.create(Phaser.Group.prototype);
-Blips.prototype.constructor = Blips;
-
-Blips.prototype.addBlip = function(x, y, body, endX, endY, duration, font, size) {
-  var blip = this.getFirstExists(false);
-  endX = endX === undefined ? x : endX;
-  endY = endY === undefined ? 0 : endY;
-  if (blip) {
-    blip.revive();
-    blip.reset(x, y);
-    blip.text = body;
-    blip.alpha = 1.0;
-  } else {
-    blip = this.game.add.bitmapText(x, y, font, body, size);
-    blip.anchor.setTo(0.5, 0.7);
-    this.add(blip);
-  }
-  var tween = this.game.add.tween(blip).to(
-    {alpha: 0, x: endX, y: endY}, duration, Phaser.Easing.Cubic.In, true, 0
-  )
-  tween.onComplete.add(function () {
-    blip.kill();
-  });
-};
-},{}],7:[function(require,module,exports){
-'use strict';
-
-module.exports = Bloodsplosion;
-
-function Bloodsplosion() {
-  Phaser.Group.apply(this, arguments);
-  this.bloodEmitter = this.game.add.emitter(0, 0, 100);
-  this.bloodEmitter.makeParticles('bloodsplat');
-  this.bloodEmitter.gravity = 600;
-  this.bloodEmitter.setAlpha(0.5, 0, 1000);
-  this.bloodEmitter.setRotation(0, 0);
-  this.add(this.bloodEmitter);
-}
-
-Bloodsplosion.prototype = Object.create(Phaser.Group.prototype);
-Bloodsplosion.prototype.constructor = Bloodsplosion;
-
-Bloodsplosion.prototype.burst = function (x, y) {
-  this.bloodEmitter.x = x;
-  this.bloodEmitter.y = y;
-  this.bloodEmitter.start(true, 500, null, 3);
-};
-
-},{}],8:[function(require,module,exports){
-'use strict';
-
-module.exports = Crosshair;
-
-function Crosshair(game, x, y) {
-  Phaser.Sprite.call(this, game, x, y, 'crosshair');
-  this.anchor.setTo(0.5, 0.5);  
-}
-
-Crosshair.prototype = Object.create(Phaser.Sprite.prototype);
-Crosshair.prototype.constructor = Crosshair;
-
-Crosshair.prototype.update = function () {
-  Phaser.Sprite.prototype.update.call(this);
-  var pointer = this.game.input.activePointer;
-  if (pointer.withinGame) {
-    this.position.setTo(pointer.x, pointer.y);
-  }
-};
-
-},{}],9:[function(require,module,exports){
-
-module.exports = Enemy;
-
-function Enemy(game, x, y) {
-  Phaser.Sprite.call(this, game, x, y, 'soldier');
-  this.anchor.setTo(0.5, 0.9);
-  this.animations.add('idle', [0]);
-  var deathAnim = this.animations.add('die', [1,2,3,4,5,6,7,8,9,10,11,12,13]);
-  deathAnim.onComplete.add(function () {
-    game.sound.play('hit', 0.25, false);
-    this.kill();
-    this.visible = true;
-    this.exists = true;
-  }.bind(this));
-  this.isDying = false;
-}
-
-Enemy.prototype = Object.create(Phaser.Sprite.prototype);
-Enemy.prototype.constructor = Enemy;
-
-},{}],10:[function(require,module,exports){
-'use strict';
-
-//global variables
-window.onload = function () {
-  var game = new Phaser.Game(400, 600, Phaser.AUTO, 'badges-of-honor');
-
-  // Game States
-  game.state.add('achievements', require('./states/achievements'));
-  game.state.add('boot', require('./states/boot'));
-  game.state.add('gameover', require('./states/gameover'));
-  game.state.add('levels', require('./states/levels'));
-  game.state.add('menu', require('./states/menu'));
-  game.state.add('play', require('./states/play'));
-  game.state.add('preload', require('./states/preload'));
-  
-
-  game.state.start('boot');
-};
-},{"./states/achievements":11,"./states/boot":12,"./states/gameover":13,"./states/levels":14,"./states/menu":15,"./states/play":16,"./states/preload":17}],11:[function(require,module,exports){
-'use strict';
-
 module.exports = [
   [100, ' First\nBlood'],
   [200, 'Second\n Blood'],
@@ -352,74 +39,7 @@ module.exports = [
   [16000, 'Ramboesque']
 ];
 
-},{}],12:[function(require,module,exports){
-
-'use strict';
-
-function Boot() {
-}
-
-Boot.prototype = {
-  preload: function() {
-    this.load.image('preloader', 'assets/preloader.gif');
-  },
-  create: function() {
-    this.game.input.maxPointers = 1;
-    if (this.game.device.desktop) {
-      this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-      this.scale.setMinMax(320, 480, 400, 600);
-      this.scale.pageAlignHorizontally = true;
-      this.scale.pageAlignVertically = true;
-    } else {
-      this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-      this.scale.setMinMax(320, 480, 400, 600);
-      this.scale.pageAlignHorizontally = true;
-      this.scale.pageAlignVertically = true;
-    }
-    this.game.state.start('preload');
-  }
-};
-
-module.exports = Boot;
-
-},{}],13:[function(require,module,exports){
-
-'use strict';
-function GameOver() {}
-
-GameOver.prototype = {
-  init: function (reason) {
-    this.reason = reason || '';
-  },
-  preload: function () {
-
-  },
-  create: function () {
-    this.titleText = this.game.add.bitmapText(this.game.world.centerX, 100, 'dday', 'Executed!', 64);
-    this.titleText.anchor.setTo(0.5, 0.5);
-
-    if (this.reason) {
-      this.congratsText = this.game.add.bitmapText(
-        this.game.world.centerX, 200, 'dday', this.reason, 24
-      );
-      this.congratsText.anchor.setTo(0.5, 0.5);
-    }
-    this.instructionText = this.game.add.bitmapText(
-      this.game.world.centerX, 300, 'dday', 'Click To Re-enlist', 32
-    );
-    this.instructionText.anchor.setTo(0.5, 0.5);
-
-    this.game.score = 0;
-  },
-  update: function () {
-    if(this.game.input.activePointer.justPressed()) {
-      this.game.state.start('play');
-    }
-  }
-};
-module.exports = GameOver;
-
-},{}],14:[function(require,module,exports){
+},{}],2:[function(require,module,exports){
 'use strict';
 
 module.exports = [
@@ -599,7 +219,422 @@ module.exports = [
   }
 ];
 
+},{}],3:[function(require,module,exports){
+'use strict';
+
+module.exports = ActionList;
+
+function ActionList(game, actions) {
+  this.game = game;
+  this.actions = actions;
+  this.action = null;
+  this.actionIndex = -1;
+}
+
+ActionList.prototype = {
+  update: function () {
+    if (this.action && this.action.update) {
+      this.action.update();
+    }
+  },
+  start: function () {
+    this.actionIndex = -1;
+    this.next();
+  },
+  stop: function () {
+    if (this.action && this.action.stop) {
+      this.action.stop();
+    }
+  },
+  next: function () {
+    if (this.action && this.action.stop) {
+      this.action.stop();
+    }
+    this.actionIndex++;
+    this.action = this.actions[this.actionIndex];
+    if (this.action) {
+      this.action.game = this.game;  // I'm lazy
+      this.action.gameState = this.game.state.states[this.game.state.current];
+      this.action.actionList = this;
+      if (this.action.start) {
+        this.action.start();
+      }
+    }
+  }
+
+};
+
+},{}],4:[function(require,module,exports){
+'use strict';
+
+module.exports = ActionLists;
+
+function ActionLists(actionLists) {
+  this.actionLists = actionLists;
+  this.actionList = null;
+}
+
+ActionLists.prototype = {
+  start: function (name) {
+    if (this.actionList) {
+      this.actionList.stop();
+    }
+    this.actionList = this.actionLists[name];
+    this.actionList.start();
+  },
+  stop: function (name) {
+    if (this.actionList) {
+      this.actionList.stop();
+    }
+  },
+  update: function () {
+    if (this.actionList) {
+      this.actionList.update();
+    }
+  }
+};
+
+},{}],5:[function(require,module,exports){
+'use strict';
+
+module.exports = ReaderAction;
+
+function ReaderAction(options) {
+  this.textObject = options.textObject;
+  this.randomLines = options.randomLines;
+  this.lines = options.lines;
+  this.displayTime = options.displayTime || 1000;
+  this.hideTime = options.hideTime || 500;
+}
+
+ReaderAction.prototype = {
+  start: function () {
+    this.lineIndex = -1;
+    this.tween = null;
+    this.textObject.alpha = 0.0;
+    if (this.randomLines) {
+      this.lines = this.randomLines[Math.floor(Math.random() * this.randomLines.length)];
+    }
+    this.nextText();
+  },
+  nextText: function () {
+    this.lineIndex++;
+    if (this.lines.length <= this.lineIndex) {
+      this.actionList.next();
+      return;
+    }
+    var line = this.lines[this.lineIndex];
+    this.textObject.text = line;
+    this.tween = this.game.add.tween(this.textObject).to({alpha: 1.0}, this.hideTime, Phaser.Easing.Linear.None, true);
+    this.tween.onComplete.addOnce(function () {
+      this.tween = this.game.add.tween(this.textObject).to({alpha: 0.0}, this.hideTime, Phaser.Easing.Linear.None, true, this.displayTime);
+      this.tween.onComplete.addOnce(function () {
+        this.nextText();
+      }, this);
+    }, this);
+  },
+  stop: function () {
+    if (this.tween) {
+      this.tween.stop();
+      this.game.tweens.remove(this.tween);
+      this.tween = null;
+    }
+  }
+}
+},{}],6:[function(require,module,exports){
+'use strict';
+
+module.exports = WaitAction;
+
+function WaitAction(time) {
+  this.time = time;
+}
+
+WaitAction.prototype = {
+  start: function () {
+    this.countdown = this.time;
+  },
+  update: function () {
+    this.countdown -= this.game.time.physicsElapsed;
+    if (this.countdown <= 0) {
+      this.actionList.next();
+    }
+  }
+};
+
+},{}],7:[function(require,module,exports){
+'use strict';
+
+module.exports = BadgeBlips;
+
+function BadgeBlips() {
+  Phaser.Group.apply(this, arguments);
+}
+
+BadgeBlips.prototype = Object.create(Phaser.Group.prototype);
+BadgeBlips.prototype.constructor = BadgeBlips;
+
+BadgeBlips.prototype.addBlip = function(x, y, body, duration, font, size) {
+  var blip = this.getFirstExists(false);
+  if (blip) {
+    blip.revive();
+    blip.reset(x, y);
+    blip.bitmapText.text = body;
+    blip.alpha = 1.0;
+  } else {
+    blip = new BadgeBlip(this.game, x, y, font, size);
+    blip.bitmapText.text = body;
+    this.add(blip);
+  }
+  blip.scale.setTo(0.3, 0.3);
+  var scaleTween = this.game.add.tween(blip.scale).to(
+    {x:1.0, y:1.0}, 250, Phaser.Easing.Elastic.Out, true, 0
+  );
+  var tween = this.game.add.tween(blip.scale).to(
+    {y:0}, 250, Phaser.Easing.Elastic.In, false, duration
+  );
+  scaleTween.chain(tween);
+  tween.onComplete.add(function () {
+    blip.kill();
+  });
+};
+
+function BadgeBlip(game, x, y, font, size) {
+  Phaser.Sprite.call(this, game, x, y);
+  this.badge = this.game.add.sprite(0, 0, 'badge');
+  this.badge.anchor.setTo(0.5, 0.5);
+  this.badge.alpha = 0.9;
+  this.addChild(this.badge);
+  this.bitmapText = this.game.add.bitmapText(0, 0, font, '', size);
+  this.bitmapText.anchor.setTo(0.5, 0.7);
+  this.addChild(this.bitmapText);
+  this.anchor.setTo(0.5, 0.5);
+}
+
+BadgeBlip.prototype = Object.create(Phaser.Sprite.prototype);
+BadgeBlip.prototype.constructor = BadgeBlip;
+
+},{}],8:[function(require,module,exports){
+'use strict';
+
+module.exports = Blips;
+
+function Blips() {
+  Phaser.Group.apply(this, arguments);
+}
+
+Blips.prototype = Object.create(Phaser.Group.prototype);
+Blips.prototype.constructor = Blips;
+
+Blips.prototype.addBlip = function(x, y, body, endX, endY, duration, font, size) {
+  var blip = this.getFirstExists(false);
+  endX = endX === undefined ? x : endX;
+  endY = endY === undefined ? 0 : endY;
+  if (blip) {
+    blip.revive();
+    blip.reset(x, y);
+    blip.text = body;
+    blip.alpha = 1.0;
+  } else {
+    blip = this.game.add.bitmapText(x, y, font, body, size);
+    blip.anchor.setTo(0.5, 0.7);
+    this.add(blip);
+  }
+  var tween = this.game.add.tween(blip).to(
+    {alpha: 0, x: endX, y: endY}, duration, Phaser.Easing.Cubic.In, true, 0
+  )
+  tween.onComplete.add(function () {
+    blip.kill();
+  });
+};
+},{}],9:[function(require,module,exports){
+'use strict';
+
+module.exports = Bloodsplosion;
+
+function Bloodsplosion() {
+  Phaser.Group.apply(this, arguments);
+  this.bloodEmitter = this.game.add.emitter(0, 0, 100);
+  this.bloodEmitter.makeParticles('bloodsplat');
+  this.bloodEmitter.gravity = 600;
+  this.bloodEmitter.setAlpha(0.5, 0, 1000);
+  this.bloodEmitter.setRotation(0, 0);
+  this.add(this.bloodEmitter);
+}
+
+Bloodsplosion.prototype = Object.create(Phaser.Group.prototype);
+Bloodsplosion.prototype.constructor = Bloodsplosion;
+
+Bloodsplosion.prototype.burst = function (x, y) {
+  this.bloodEmitter.x = x;
+  this.bloodEmitter.y = y;
+  this.bloodEmitter.start(true, 500, null, 3);
+};
+
+},{}],10:[function(require,module,exports){
+'use strict';
+
+module.exports = Crosshair;
+
+function Crosshair(game, x, y) {
+  Phaser.Sprite.call(this, game, x, y, 'crosshair');
+  this.anchor.setTo(0.5, 0.5);  
+}
+
+Crosshair.prototype = Object.create(Phaser.Sprite.prototype);
+Crosshair.prototype.constructor = Crosshair;
+
+Crosshair.prototype.update = function () {
+  Phaser.Sprite.prototype.update.call(this);
+  var pointer = this.game.input.activePointer;
+  if (pointer.withinGame) {
+    this.position.setTo(pointer.x, pointer.y);
+  }
+};
+
+},{}],11:[function(require,module,exports){
+
+module.exports = Enemy;
+
+function Enemy(game, x, y) {
+  Phaser.Sprite.call(this, game, x, y, 'soldier');
+  this.anchor.setTo(0.5, 0.9);
+  this.animations.add('idle', [0]);
+  var deathAnim = this.animations.add('die', [1,2,3,4,5,6,7,8,9,10,11,12,13]);
+  deathAnim.onComplete.add(function () {
+    game.sound.play('hit', 0.25, false);
+    this.kill();
+    this.visible = true;
+    this.exists = true;
+  }.bind(this));
+  this.isDying = false;
+}
+
+Enemy.prototype = Object.create(Phaser.Sprite.prototype);
+Enemy.prototype.constructor = Enemy;
+
+},{}],12:[function(require,module,exports){
+'use strict';
+
+//global variables
+window.onload = function () {
+  var game = new Phaser.Game(400, 600, Phaser.AUTO, 'badges-of-honor');
+
+  // Game States
+  game.state.add('boot', require('./states/boot'));
+  game.state.add('gameover', require('./states/gameover'));
+  game.state.add('jobAssignment', require('./states/jobAssignment'));
+  game.state.add('menu', require('./states/menu'));
+  game.state.add('play', require('./states/play'));
+  game.state.add('preload', require('./states/preload'));
+  
+
+  game.state.start('boot');
+};
+},{"./states/boot":13,"./states/gameover":14,"./states/jobAssignment":15,"./states/menu":16,"./states/play":17,"./states/preload":18}],13:[function(require,module,exports){
+
+'use strict';
+
+function Boot() {
+}
+
+Boot.prototype = {
+  preload: function() {
+    this.load.image('preloader', 'assets/preloader.gif');
+  },
+  create: function() {
+    this.game.input.maxPointers = 1;
+    if (this.game.device.desktop) {
+      this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+      this.scale.setMinMax(320, 480, 400, 600);
+      this.scale.pageAlignHorizontally = true;
+      this.scale.pageAlignVertically = true;
+    } else {
+      this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+      this.scale.setMinMax(320, 480, 400, 600);
+      this.scale.pageAlignHorizontally = true;
+      this.scale.pageAlignVertically = true;
+    }
+    this.game.state.start('preload');
+  }
+};
+
+module.exports = Boot;
+
+},{}],14:[function(require,module,exports){
+
+'use strict';
+function GameOver() {}
+
+GameOver.prototype = {
+  init: function (reason) {
+    this.reason = reason || '';
+  },
+  preload: function () {
+
+  },
+  create: function () {
+    this.titleText = this.game.add.bitmapText(this.game.world.centerX, 100, 'dday', 'Executed!', 64);
+    this.titleText.anchor.setTo(0.5, 0.5);
+
+    if (this.reason) {
+      this.congratsText = this.game.add.bitmapText(
+        this.game.world.centerX, 200, 'dday', this.reason, 24
+      );
+      this.congratsText.anchor.setTo(0.5, 0.5);
+    }
+    this.instructionText = this.game.add.bitmapText(
+      this.game.world.centerX, 300, 'dday', 'Click To Re-enlist', 32
+    );
+    this.instructionText.anchor.setTo(0.5, 0.5);
+
+    this.game.score = 0;
+  },
+  update: function () {
+    if(this.game.input.activePointer.justPressed()) {
+      this.game.state.start('play');
+    }
+  }
+};
+module.exports = GameOver;
+
 },{}],15:[function(require,module,exports){
+'use strict';
+
+var Crosshair = require('../elements/crosshair');
+
+function JobAssignment() {}
+
+JobAssignment.prototype = {
+  preload: function() {
+
+  },
+  create: function() {
+    this.titleText = this.game.add.bitmapText(
+      this.game.world.centerX, 300, 'dday', 'Operational Assignment', 64
+    );
+    this.titleText.anchor.setTo(0.5, 0.5);
+
+    this.instructionsText = this.game.add.bitmapText(
+      this.game.world.centerX, 400, 'dday', '', 28
+    );
+    this.instructionsText.anchor.setTo(0.5, 0.5);
+
+    this.crosshair = new Crosshair(this.game, 0, 0);
+    this.game.add.existing(this.crosshair);
+  },
+  update: function() {
+    var pointer = this.game.input.activePointer;
+    if(pointer && pointer.justPressed()) {
+      this.game.sound.play('shoot')
+      this.game.state.start('play', true, false, 0);
+    }
+  }
+};
+
+module.exports = JobAssignment;
+
+},{"../elements/crosshair":10}],16:[function(require,module,exports){
 'use strict';
 
 var Crosshair = require('../elements/crosshair');
@@ -635,17 +670,17 @@ Menu.prototype = {
 
 module.exports = Menu;
 
-},{"../elements/crosshair":8}],16:[function(require,module,exports){
+},{"../elements/crosshair":10}],17:[function(require,module,exports){
 'use strict';
 
 var _ = require('underscore');
-var achievementList = require('./achievements');
+var achievementList = require('../boh/achievements');
 var BadgeBlips = require('../elements/badgeblips');
 var Blips = require('../elements/blips');
 var Bloodsplosion = require('../elements/bloodsplosion');
 var Crosshair = require('../elements/crosshair');
 var Enemy = require('../elements/enemy');
-var levelConfigs = require('./levels');
+var levelConfigs = require('../boh/levels');
 var ActionList = require('../elements/actionlist');
 var ActionLists = require('../elements/actionlists');
 var ReaderAction = require('../elements/actions/reader');
@@ -939,7 +974,7 @@ Play.prototype = {
   }
 };
 
-},{"../elements/actionlist":1,"../elements/actionlists":2,"../elements/actions/reader":3,"../elements/actions/wait":4,"../elements/badgeblips":5,"../elements/blips":6,"../elements/bloodsplosion":7,"../elements/crosshair":8,"../elements/enemy":9,"./achievements":11,"./levels":14,"underscore":18}],17:[function(require,module,exports){
+},{"../boh/achievements":1,"../boh/levels":2,"../elements/actionlist":3,"../elements/actionlists":4,"../elements/actions/reader":5,"../elements/actions/wait":6,"../elements/badgeblips":7,"../elements/blips":8,"../elements/bloodsplosion":9,"../elements/crosshair":10,"../elements/enemy":11,"underscore":19}],18:[function(require,module,exports){
 'use strict';
 function Preload() {
   this.asset = null;
@@ -978,7 +1013,7 @@ Preload.prototype = {
 
 module.exports = Preload;
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 //     Underscore.js 1.8.3
 //     http://underscorejs.org
 //     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -2528,4 +2563,4 @@ module.exports = Preload;
   }
 }.call(this));
 
-},{}]},{},[10]);
+},{}]},{},[12]);
