@@ -644,8 +644,7 @@ JobAssignment.prototype = {
           {x:2, y:2}, 1000, Phaser.Easing.Elastic.Out, true, 0
         );
       }
-      if(this.assignmentCountdown < -2) { //pointer && pointer.justPressed()) {
-        this.game.sound.play('shoot');
+      if(this.assignmentCountdown < -2) {
         this.game.state.start('play', true, false, 0);
       }
     } else {
@@ -653,6 +652,7 @@ JobAssignment.prototype = {
       if (this.assChangeCountdown <= 0) {
         this.assignmentText.text = assignments[Math.floor(Math.random() * assignments.length)];
         this.assChangeCountdown = 0.1;
+        this.game.sound.play('select', 0.4);
       }
     }
   }
@@ -750,7 +750,7 @@ Play.prototype = {
     //
     this.shotCountdown = 0;
     this.shotDelay = 0.1;
-    this.shootSound = this.game.add.audio('shoot');
+    //this.shootSound = this.game.add.audio('shoot');
     //
     this.numBullets = 20;
     this.bulletType = this.game.add.sprite(this.game.width * 0.85, this.game.height * 0.95, 'm16ammo');
@@ -903,8 +903,8 @@ Play.prototype = {
     if (this.shotCountdown <= 0 && pointer.isDown && this.numBullets > 0) {
       this.numBullets -= 1;
       this.bulletText.text = this.numBullets;
-      //this.game.sound.play('shoot', 1.0, false, true);
-      this.shootSound.play();
+      this.game.sound.play('shoot', 1.0, false, true);
+      //this.shootSound.play();
       this.shotCountdown = this.shotDelay;
       var hitEnemy;
       // enemies are sorted back to front
@@ -1028,6 +1028,7 @@ Preload.prototype = {
     this.load.image('badge', 'assets/badge.png');
     this.load.audio('shoot', ['assets/ar15.m4a', 'assets/ar15.ogg']);
     this.load.audio('hit', 'assets/hit.wav');
+    this.load.audio('select', 'assets/select.wav');
     this.load.audio('achievement', 'assets/achievement.wav');
     this.game.load.bitmapFont('dday', 'assets/font.png', 'assets/font.fnt');
   },
