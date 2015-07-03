@@ -1,6 +1,7 @@
 'use strict';
 
 var _ = require('underscore');
+var Blips = require('../elements/blips');
 var Enemy = require('../elements/enemy');
 var levelConfigs = require('./levels');
 var ActionList = require('../elements/actionlist');
@@ -46,7 +47,8 @@ Play.prototype = {
     this.shotDelay = 0.2;
     this.shootSound = this.game.add.audio('shoot');
     //
-    this.scoreBlips = this.game.add.group();
+    this.scoreBlips = new Blips(this.game);
+    this.game.add.existing(this.scoreBlips)
     //
     this.winTriggered = false;
     //
@@ -192,30 +194,10 @@ Play.prototype = {
     enemy.play('die', 30);
     var scoreValue = 100;
     this.game.score += scoreValue;
-    this.createScoreBlip(enemy.x, enemy.y - enemy.height * enemy.anchor.y, '+' + scoreValue);
-  },
-  createScoreBlip: function (x, y, value) {
-    var blip = this.scoreBlips.getFirstExists(false);
-    if (blip) {
-      blip.revive();
-      blip.reset(x, y);
-      blip.text = value;
-      blip.alpha = 1.0;
-    } else {
-      blip = this.game.add.text(x, y, value, {
-        font: '32px Arial',
-        fill: 'white',
-        align: 'center'
-      });
-      blip.anchor.setTo(0.5, 0.7);
-      this.scoreBlips.add(blip);
-    }
-    var tween = this.game.add.tween(blip).to(
-      {alpha: 0, x: this.game.width * 0.5, y: this.scoreText.y}, 750, Phaser.Easing.Cubic.In, true, 0
-    )
-    tween.onComplete.add(function () {
-      blip.kill();
-    });
+    this.scoreBlips.addBlip(
+      enemy.x, enemy.y - enemy.height * enemy.anchor.y, '+' + scoreValue, undefined,
+      this.game.width * 0.5, this.scoreText.y
+    );
   },
   bloodBurst: function (x, y) {
     this.bloodEmitter.x = x;

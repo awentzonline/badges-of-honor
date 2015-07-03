@@ -142,6 +142,44 @@ WaitAction.prototype = {
 };
 
 },{}],5:[function(require,module,exports){
+'use strict';
+
+module.exports = Blips;
+
+function Blips() {
+  Phaser.Group.apply(this, arguments);
+}
+
+Blips.prototype = Object.create(Phaser.Group.prototype);
+Blips.prototype.constructor = Blips;
+
+Blips.prototype.addBlip = function(x, y, body, style, endX, endY, duration) {
+  var blip = this.getFirstExists(false);
+  style = style || {
+    font: '32px Arial',
+    fill: 'white',
+    align: 'center'
+  };
+  endX = endX === undefined ? x : endX;
+  endY = endY === undefined ? 0 : endY;
+  if (blip) {
+    blip.revive();
+    blip.reset(x, y);
+    blip.text = body;
+    blip.alpha = 1.0;
+  } else {
+    blip = this.game.add.text(x, y, body, style);
+    blip.anchor.setTo(0.5, 0.7);
+    this.add(blip);
+  }
+  var tween = this.game.add.tween(blip).to(
+    {alpha: 0, x: endX, y: endY}, duration, Phaser.Easing.Cubic.In, true, 0
+  )
+  tween.onComplete.add(function () {
+    blip.kill();
+  });
+};
+},{}],6:[function(require,module,exports){
 
 module.exports = Enemy;
 
@@ -162,7 +200,7 @@ function Enemy(game, x, y) {
 Enemy.prototype = Object.create(Phaser.Sprite.prototype);
 Enemy.prototype.constructor = Enemy;
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 'use strict';
 
 //global variables
@@ -180,7 +218,7 @@ window.onload = function () {
 
   game.state.start('boot');
 };
-},{"./states/boot":7,"./states/gameover":8,"./states/levels":9,"./states/menu":10,"./states/play":11,"./states/preload":12}],7:[function(require,module,exports){
+},{"./states/boot":8,"./states/gameover":9,"./states/levels":10,"./states/menu":11,"./states/play":12,"./states/preload":13}],8:[function(require,module,exports){
 
 'use strict';
 
@@ -210,7 +248,7 @@ Boot.prototype = {
 
 module.exports = Boot;
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 
 'use strict';
 function GameOver() {}
@@ -244,7 +282,7 @@ GameOver.prototype = {
 };
 module.exports = GameOver;
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 'use strict';
 
 module.exports = [
@@ -424,7 +462,7 @@ module.exports = [
   }
 ];
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 
 'use strict';
 function Menu() {}
@@ -456,10 +494,11 @@ Menu.prototype = {
 
 module.exports = Menu;
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 'use strict';
 
 var _ = require('underscore');
+var Blips = require('../elements/blips');
 var Enemy = require('../elements/enemy');
 var levelConfigs = require('./levels');
 var ActionList = require('../elements/actionlist');
@@ -505,7 +544,8 @@ Play.prototype = {
     this.shotDelay = 0.2;
     this.shootSound = this.game.add.audio('shoot');
     //
-    this.scoreBlips = this.game.add.group();
+    this.scoreBlips = new Blips(this.game);
+    this.game.add.existing(this.scoreBlips)
     //
     this.winTriggered = false;
     //
@@ -651,30 +691,10 @@ Play.prototype = {
     enemy.play('die', 30);
     var scoreValue = 100;
     this.game.score += scoreValue;
-    this.createScoreBlip(enemy.x, enemy.y - enemy.height * enemy.anchor.y, '+' + scoreValue);
-  },
-  createScoreBlip: function (x, y, value) {
-    var blip = this.scoreBlips.getFirstExists(false);
-    if (blip) {
-      blip.revive();
-      blip.reset(x, y);
-      blip.text = value;
-      blip.alpha = 1.0;
-    } else {
-      blip = this.game.add.text(x, y, value, {
-        font: '32px Arial',
-        fill: 'white',
-        align: 'center'
-      });
-      blip.anchor.setTo(0.5, 0.7);
-      this.scoreBlips.add(blip);
-    }
-    var tween = this.game.add.tween(blip).to(
-      {alpha: 0, x: this.game.width * 0.5, y: this.scoreText.y}, 750, Phaser.Easing.Cubic.In, true, 0
-    )
-    tween.onComplete.add(function () {
-      blip.kill();
-    });
+    this.scoreBlips.addBlip(
+      enemy.x, enemy.y - enemy.height * enemy.anchor.y, '+' + scoreValue, undefined,
+      this.game.width * 0.5, this.scoreText.y
+    );
   },
   bloodBurst: function (x, y) {
     this.bloodEmitter.x = x;
@@ -696,7 +716,7 @@ Play.prototype = {
   }
 };
 
-},{"../elements/actionlist":1,"../elements/actionlists":2,"../elements/actions/reader":3,"../elements/actions/wait":4,"../elements/enemy":5,"./levels":9,"underscore":13}],12:[function(require,module,exports){
+},{"../elements/actionlist":1,"../elements/actionlists":2,"../elements/actions/reader":3,"../elements/actions/wait":4,"../elements/blips":5,"../elements/enemy":6,"./levels":10,"underscore":14}],13:[function(require,module,exports){
 'use strict';
 function Preload() {
   this.asset = null;
@@ -731,7 +751,7 @@ Preload.prototype = {
 
 module.exports = Preload;
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 //     Underscore.js 1.8.3
 //     http://underscorejs.org
 //     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -2281,4 +2301,4 @@ module.exports = Preload;
   }
 }.call(this));
 
-},{}]},{},[6]);
+},{}]},{},[7]);
