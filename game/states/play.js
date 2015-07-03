@@ -2,6 +2,7 @@
 
 var _ = require('underscore');
 var Blips = require('../elements/blips');
+var Bloodsplosion = require('../elements/bloodsplosion');
 var Enemy = require('../elements/enemy');
 var levelConfigs = require('./levels');
 var ActionList = require('../elements/actionlist');
@@ -25,11 +26,7 @@ Play.prototype = {
   create: function() {
     this.background = this.game.add.sprite(0, 0, 'background');
     // splatter
-    this.bloodEmitter = this.game.add.emitter(0, 0, 100);
-    this.bloodEmitter.makeParticles('bloodsplat');
-    this.bloodEmitter.gravity = 600;
-    this.bloodEmitter.setAlpha(0.5, 0, 1000);
-    this.bloodEmitter.setRotation(0, 0);
+    this.bloodsplosion = new Bloodsplosion(this.game);
     // enemies
     this.enemyGroup = this.game.add.group();
     _.each(this.levelConfig.targets, function (conf) {
@@ -166,7 +163,7 @@ Play.prototype = {
       }
       if (hitEnemy) {
         this.enemyShot(hitEnemy);
-        this.bloodBurst(pointer.x, pointer.y);
+        this.bloodsplosion.burst(pointer.x, pointer.y);
       }
     }
     if (!this.winTriggered && this.enemyGroup.countLiving() == 0) {
@@ -198,11 +195,6 @@ Play.prototype = {
       enemy.x, enemy.y - enemy.height * enemy.anchor.y, '+' + scoreValue, undefined,
       this.game.width * 0.5, this.scoreText.y
     );
-  },
-  bloodBurst: function (x, y) {
-    this.bloodEmitter.x = x;
-    this.bloodEmitter.y = y;
-    this.bloodEmitter.start(true, 500, null, 3);
   },
   onWin: function () {
     this.winTriggered = true;

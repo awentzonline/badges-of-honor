@@ -180,6 +180,30 @@ Blips.prototype.addBlip = function(x, y, body, style, endX, endY, duration) {
   });
 };
 },{}],6:[function(require,module,exports){
+'use strict';
+
+module.exports = Bloodsplosion;
+
+function Bloodsplosion() {
+  Phaser.Group.apply(this, arguments);
+  this.bloodEmitter = this.game.add.emitter(0, 0, 100);
+  this.bloodEmitter.makeParticles('bloodsplat');
+  this.bloodEmitter.gravity = 600;
+  this.bloodEmitter.setAlpha(0.5, 0, 1000);
+  this.bloodEmitter.setRotation(0, 0);
+  this.add(this.bloodEmitter);
+}
+
+Bloodsplosion.prototype = Object.create(Phaser.Group.prototype);
+Bloodsplosion.prototype.constructor = Bloodsplosion;
+
+Bloodsplosion.prototype.burst = function (x, y) {
+  this.bloodEmitter.x = x;
+  this.bloodEmitter.y = y;
+  this.bloodEmitter.start(true, 500, null, 3);
+};
+
+},{}],7:[function(require,module,exports){
 
 module.exports = Enemy;
 
@@ -200,7 +224,7 @@ function Enemy(game, x, y) {
 Enemy.prototype = Object.create(Phaser.Sprite.prototype);
 Enemy.prototype.constructor = Enemy;
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 'use strict';
 
 //global variables
@@ -218,7 +242,7 @@ window.onload = function () {
 
   game.state.start('boot');
 };
-},{"./states/boot":8,"./states/gameover":9,"./states/levels":10,"./states/menu":11,"./states/play":12,"./states/preload":13}],8:[function(require,module,exports){
+},{"./states/boot":9,"./states/gameover":10,"./states/levels":11,"./states/menu":12,"./states/play":13,"./states/preload":14}],9:[function(require,module,exports){
 
 'use strict';
 
@@ -248,7 +272,7 @@ Boot.prototype = {
 
 module.exports = Boot;
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 
 'use strict';
 function GameOver() {}
@@ -282,7 +306,7 @@ GameOver.prototype = {
 };
 module.exports = GameOver;
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 'use strict';
 
 module.exports = [
@@ -462,7 +486,7 @@ module.exports = [
   }
 ];
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 
 'use strict';
 function Menu() {}
@@ -494,11 +518,12 @@ Menu.prototype = {
 
 module.exports = Menu;
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 'use strict';
 
 var _ = require('underscore');
 var Blips = require('../elements/blips');
+var Bloodsplosion = require('../elements/bloodsplosion');
 var Enemy = require('../elements/enemy');
 var levelConfigs = require('./levels');
 var ActionList = require('../elements/actionlist');
@@ -522,11 +547,7 @@ Play.prototype = {
   create: function() {
     this.background = this.game.add.sprite(0, 0, 'background');
     // splatter
-    this.bloodEmitter = this.game.add.emitter(0, 0, 100);
-    this.bloodEmitter.makeParticles('bloodsplat');
-    this.bloodEmitter.gravity = 600;
-    this.bloodEmitter.setAlpha(0.5, 0, 1000);
-    this.bloodEmitter.setRotation(0, 0);
+    this.bloodsplosion = new Bloodsplosion(this.game);
     // enemies
     this.enemyGroup = this.game.add.group();
     _.each(this.levelConfig.targets, function (conf) {
@@ -663,7 +684,7 @@ Play.prototype = {
       }
       if (hitEnemy) {
         this.enemyShot(hitEnemy);
-        this.bloodBurst(pointer.x, pointer.y);
+        this.bloodsplosion.burst(pointer.x, pointer.y);
       }
     }
     if (!this.winTriggered && this.enemyGroup.countLiving() == 0) {
@@ -696,11 +717,6 @@ Play.prototype = {
       this.game.width * 0.5, this.scoreText.y
     );
   },
-  bloodBurst: function (x, y) {
-    this.bloodEmitter.x = x;
-    this.bloodEmitter.y = y;
-    this.bloodEmitter.start(true, 500, null, 3);
-  },
   onWin: function () {
     this.winTriggered = true;
     this.actionLists.start('goodGame');
@@ -716,7 +732,7 @@ Play.prototype = {
   }
 };
 
-},{"../elements/actionlist":1,"../elements/actionlists":2,"../elements/actions/reader":3,"../elements/actions/wait":4,"../elements/blips":5,"../elements/enemy":6,"./levels":10,"underscore":14}],13:[function(require,module,exports){
+},{"../elements/actionlist":1,"../elements/actionlists":2,"../elements/actions/reader":3,"../elements/actions/wait":4,"../elements/blips":5,"../elements/bloodsplosion":6,"../elements/enemy":7,"./levels":11,"underscore":15}],14:[function(require,module,exports){
 'use strict';
 function Preload() {
   this.asset = null;
@@ -751,7 +767,7 @@ Preload.prototype = {
 
 module.exports = Preload;
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 //     Underscore.js 1.8.3
 //     http://underscorejs.org
 //     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -2301,4 +2317,4 @@ module.exports = Preload;
   }
 }.call(this));
 
-},{}]},{},[7]);
+},{}]},{},[8]);
