@@ -55,14 +55,15 @@ Play.prototype = {
       fill: 'white',
       align: 'center'
     });
-    this.commandText.anchor.setTo(0.5, 0.5);
+    this.commandText.anchor.setTo(0.5, 0);
     //
     this.interpScore = this.game.score;
-    this.scoreText = this.game.add.text(this.game.width * 0.8, this.game.height * 0.05, this.interpScore, {
-      font: '32px Arial',
+    this.scoreText = this.game.add.text(this.game.width * 0.5, this.game.height * 0.1, this.interpScore, {
+      font: '42px Arial',
       fill: 'white',
-      align: 'right'
+      align: 'center'
     });
+    this.scoreText.anchor.setTo(0.5, 0.5);
     //
     this.createScripts();
   },
@@ -120,6 +121,20 @@ Play.prototype = {
             this.gameState.onLose('You were executed for disobeying orders.');
           }
         }
+      ]),
+      'goodGame': new ActionList(this.game, [
+        new ReaderAction({
+          textObject: this.commandText,
+          randomLines: [
+            ['Good Job. Level Complete.'],
+            ['Great shooting, soldier.\nGet ready for the next level.']
+          ]
+        }),
+        {
+          start: function () {
+            this.startNextLevel();
+          }.bind(this)
+        }
       ])
     });
     this.actionLists.start('start');
@@ -170,7 +185,7 @@ Play.prototype = {
     if (enemy.isDying) {
       return;
     }
-    if (this.enemyGroup.countDead() == 0) {
+    if ((this.enemyGroup.countDead()) % 2) {
       this.actionLists.start('getSome');
     }
     enemy.isDying = true;
@@ -196,7 +211,7 @@ Play.prototype = {
       this.scoreBlips.add(blip);
     }
     var tween = this.game.add.tween(blip).to(
-      {alpha: 0, y: y - 100}, 1000, Phaser.Easing.Cubic.In, true, 0
+      {alpha: 0, x: this.game.width * 0.5, y: this.scoreText.y}, 750, Phaser.Easing.Cubic.In, true, 0
     )
     tween.onComplete.add(function () {
       blip.kill();
@@ -209,7 +224,7 @@ Play.prototype = {
   },
   onWin: function () {
     this.winTriggered = true;
-    setTimeout(this.startNextLevel.bind(this), 2000);
+    this.actionLists.start('goodGame');
   },
   onLose: function (reason) {
     if (!this.winTriggered) {
