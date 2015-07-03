@@ -34,5 +34,6 @@ module.exports = [
   [14000, 'Cost of living\n Adjustment'],
   [14500, ' You are\nthe flag'],
   [15000, 'Found $20'],
-  [15500, ' Wife is\nImpressed']
+  [15500, ' Wife is\nImpressed'],
+  [16000, 'Ramboesque']
 ];
