@@ -64,7 +64,6 @@ Play.prototype = {
       align: 'right'
     });
     //
-    this.allowedToShoot = false;
     this.createScripts();
   },
   createScripts: function () {
@@ -73,19 +72,7 @@ Play.prototype = {
         new ReaderAction({
           textObject: this.commandText,
           lines: [
-            'Ready', 'Aim'
-          ]
-        }),
-        {
-          start: function () {
-            this.gameState.allowedToShoot = true;
-            this.actionList.next();
-          }
-        },
-        new ReaderAction({
-          textObject: this.commandText,
-          lines: [
-            'Fire'
+            'Ready', 'Aim', 'Fire'
           ]
         }),
         new WaitAction(5),
@@ -164,9 +151,6 @@ Play.prototype = {
         this.enemyShot(hitEnemy);
         this.bloodBurst(pointer.x, pointer.y);
       }
-      // if (!this.allowedToShoot) {
-      //   this.onLose('You were executed for shooting too early.');
-      // }
     }
     if (!this.winTriggered && this.enemyGroup.countLiving() == 0) {
       this.onWin();
