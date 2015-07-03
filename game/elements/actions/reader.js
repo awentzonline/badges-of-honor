@@ -4,11 +4,8 @@ module.exports = ReaderAction;
 
 function ReaderAction(options) {
   this.textObject = options.textObject;
-  if (options.randomLines) {
-    this.lines = options.randomLines[Math.floor(Math.random() * options.randomLines.length)];
-  } else {
-    this.lines = options.lines;  
-  }
+  this.randomLines = options.randomLines;
+  this.lines = options.lines;
   this.displayTime = options.displayTime || 1000;
   this.hideTime = options.hideTime || 500;
 }
@@ -17,8 +14,11 @@ ReaderAction.prototype = {
   start: function () {
     this.lineIndex = -1;
     this.tween = null;
-    this.nextText();
     this.textObject.alpha = 0.0;
+    if (this.randomLines) {
+      this.lines = this.randomLines[Math.floor(Math.random() * this.randomLines.length)];
+    }
+    this.nextText();
   },
   nextText: function () {
     this.lineIndex++;

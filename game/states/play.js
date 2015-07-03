@@ -40,11 +40,16 @@ Play.prototype = {
     this.enemyGroup.sort('y', Phaser.Group.SORT_ASCENDING); // higher up is farther back
     //
     this.shotCountdown = 0;
-    this.shotDelay = 0.2;
+    this.shotDelay = 0.1;
     this.shootSound = this.game.add.audio('shoot');
     //
     this.numBullets = 20;
-    this.bulletText = this.game.add.bitmapText(this.game.width * 0.1, this.game.width * 0.9, 'dday', this.numBullets)
+    this.bulletType = this.game.add.sprite(this.game.width * 0.85, this.game.height * 0.95, 'm16ammo');
+    this.bulletType.anchor.setTo(0.6, 0.7);
+    this.bulletText = this.game.add.bitmapText(this.game.width * 0.85, this.game.height * 0.95, 'dday', '', 28);
+    this.bulletText.text = this.numBullets;
+    this.bulletText.anchor.setTo(0.5, 0.5);
+    this.outOfBullets = false;
     //
     this.scoreBlips = new Blips(this.game);
     this.game.add.existing(this.scoreBlips)
@@ -55,8 +60,9 @@ Play.prototype = {
     this.commandText.anchor.setTo(0.5, 0);
     //
     this.interpScore = this.game.score;
-    this.scoreText = this.game.add.bitmapText(this.game.width * 0.5, this.game.height * 0.075, 'dday', this.interpScore, 42);
+    this.scoreText = this.game.add.bitmapText(this.game.width * 0.5, this.game.height * 0.075, 'dday', '', 42);
     this.scoreText.anchor.setTo(0.5, 0.5);
+    this.scoreText.text = this.interpScore;
     //
     this.crosshair = new Crosshair(this.game, 0, 0);
     this.game.add.existing(this.crosshair);
@@ -135,6 +141,22 @@ Play.prototype = {
             this.startNextLevel();
           }.bind(this)
         }
+      ]),
+      'outOfBullets': new ActionList(this.game,[
+        new ReaderAction({
+          textObject: this.commandText,
+          lines: [
+            'You wasted all of your ammo',
+            'The President is pissed'
+          ]
+        }),
+        new WaitAction(1),
+        {
+          start: function () {
+            this.game.score = 0;
+            this.game.state.start('play');
+          }
+        }
       ])
     });
     this.actionLists.start('start');
@@ -144,7 +166,9 @@ Play.prototype = {
     var dt = this.game.time.physicsElapsed;
     var pointer = this.game.input.activePointer;
     this.shotCountdown -= dt;
-    if (this.shotCountdown <= 0 && pointer.isDown) {
+    if (this.shotCountdown <= 0 && pointer.isDown && this.numBullets > 0) {
+      this.numBullets -= 1;
+      this.bulletText.text = this.numBullets;
       //this.game.sound.play('shoot', 1.0, false, true);
       this.shootSound.play();
       this.shotCountdown = this.shotDelay;
@@ -165,8 +189,15 @@ Play.prototype = {
         this.bloodsplosion.burst(pointer.x, pointer.y);
       }
     }
-    if (!this.winTriggered && this.enemyGroup.countLiving() == 0) {
+    // TODO: improve this 'alive' situation
+    var allEnemyDying = true;
+    this.enemyGroup.forEachAlive(function (e) { allEnemyDying &= e.isDying; })
+    if (!this.winTriggered && allEnemyDying) {
       this.onWin();
+    }
+    if (this.numBullets <= 0 && !this.winTriggered && !this.outOfBullets) {
+      this.outOfBullets = true;
+      this.actionLists.start('outOfBullets');
     }
     this.actionLists.update();
     this.updateScoreboard();
