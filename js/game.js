@@ -460,7 +460,9 @@ Play.prototype = {
         new WaitAction(5),
         {
           start: function () {
-            this.gameState.actionLists.start('hurryUp');
+            if (!this.winTriggered) {
+              this.gameState.actionLists.start('hurryUp');
+            }
           }
         }
       ]),
@@ -478,8 +480,6 @@ Play.prototype = {
             this.gameState.onLose('You were executed for disobeying orders.');
           }
         }
-      ]),
-      'goodRound': new ActionList(this.game, [
       ])
     });
     this.actionLists.start('start');
@@ -572,11 +572,12 @@ Play.prototype = {
   },
   onWin: function () {
     this.winTriggered = true;
-    this.actionLists.start('goodRound');
     setTimeout(this.startNextLevel.bind(this), 2000);
   },
   onLose: function (reason) {
-    this.game.state.start('gameover', true, false, reason);
+    if (!this.winTriggered) {
+      this.game.state.start('gameover', true, false, reason);
+    }
   },
   startNextLevel: function () {
     var nextId = this.levelId + 1;
