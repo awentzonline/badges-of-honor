@@ -61,6 +61,11 @@ ActionLists.prototype = {
     this.actionList = this.actionLists[name];
     this.actionList.start();
   },
+  stop: function (name) {
+    if (this.actionList) {
+      this.actionList.stop();
+    }
+  },
   update: function () {
     if (this.actionList) {
       this.actionList.update();
@@ -75,7 +80,11 @@ module.exports = ReaderAction;
 
 function ReaderAction(options) {
   this.textObject = options.textObject;
-  this.lines = options.lines;
+  if (options.randomLines) {
+    this.lines = options.randomLines[Math.floor(Math.random() * options.randomLines.length)];
+  } else {
+    this.lines = options.lines;  
+  }
   this.displayTime = options.displayTime || 1000;
   this.hideTime = options.hideTime || 500;
 }
@@ -104,9 +113,11 @@ ReaderAction.prototype = {
     }, this);
   },
   stop: function () {
-    this.tween.stop();
-    this.game.tweens.remove(this.tween);
-    this.tween = null;
+    if (this.tween) {
+      this.tween.stop();
+      this.game.tweens.remove(this.tween);
+      this.tween = null;
+    }
   }
 }
 },{}],4:[function(require,module,exports){
@@ -359,8 +370,7 @@ Play.prototype = {
       var enemy = new Enemy(this.game, this.game.width * conf.x, this.game.height * conf.y)
       this.game.add.existing(enemy);
       enemy.inputEnabled = true;
-      //enemy.input.pixelPerfectOver = true;
-      //enemy.events.onInputDown.add(this.enemyShot, this, enemy);
+      enemy.input.pixelPerfectClick = true;
       this.enemyGroup.add(enemy);
     }.bind(this));
     this.enemyGroup.sort('y', Phaser.Group.SORT_ASCENDING); // higher up is farther back
@@ -368,7 +378,7 @@ Play.prototype = {
     this.crosshair = this.game.add.sprite(0, 0, 'crosshair');
     this.crosshair.anchor.setTo(0.5, 0.5);
     this.shotCountdown = 0;
-    this.shotDelay = 0.5;
+    this.shotDelay = 0.1;
     //
     this.scoreBlips = this.game.add.group();
     //
@@ -412,6 +422,28 @@ Play.prototype = {
           }
         }
       ]),
+      'getSome': new ActionList(this.game, [
+        new ReaderAction({
+          textObject: this.commandText,
+          randomLines: [
+            [
+              'Woooo yeah!'
+            ],
+            [
+              'Nice shot!'
+            ],
+            [
+              'Get some, motherfuckers!'
+            ]
+          ]
+        }),
+        new WaitAction(5),
+        {
+          start: function () {
+            this.gameState.actionLists.start('hurryUp');
+          }
+        }
+      ]),
       'hurryUp': new ActionList(this.game, [
         new ReaderAction({
           textObject: this.commandText,
@@ -426,6 +458,8 @@ Play.prototype = {
             this.gameState.onLose('You were executed for disobeying orders.');
           }
         }
+      ]),
+      'goodRound': new ActionList(this.game, [
       ])
     });
     this.actionLists.start('start');
@@ -438,7 +472,7 @@ Play.prototype = {
     this.crosshair.position.setTo(pointer.x, pointer.y);
     this.shotCountdown -= dt;
     if (this.shotCountdown <= 0 && pointer.isDown) {
-      this.game.sound.play('shoot', 1.0, false, false);
+      this.game.sound.play('shoot', 1.0, false, true);
       this.shotCountdown = this.shotDelay;
       var hitEnemy;
       // enemies are sorted back to front
@@ -467,6 +501,9 @@ Play.prototype = {
   enemyShot: function(enemy) {
     if (enemy.isDying) {
       return;
+    }
+    if (this.enemyGroup.countDead() == 0) {
+      this.actionLists.start('getSome');
     }
     enemy.isDying = true;
     enemy.play('die', 30);
@@ -497,6 +534,7 @@ Play.prototype = {
   },
   onWin: function () {
     this.winTriggered = true;
+    this.actionLists.start('goodRound');
     setTimeout(this.startNextLevel.bind(this), 2000);
   },
   onLose: function (reason) {
@@ -524,7 +562,7 @@ Preload.prototype = {
     this.load.setPreloadSprite(this.asset);
     this.load.spritesheet('soldier', 'assets/soldier_fall.png', 61, 200, 15);
     this.load.image('crosshair', 'assets/crosshair.png');
-    this.load.audio('shoot', 'assets/shoot.wav');
+    this.load.audio('shoot', 'assets/ar15.wav');
     this.load.audio('hit', 'assets/hit.wav');
   },
   create: function() {

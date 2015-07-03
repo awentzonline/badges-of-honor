@@ -13,7 +13,7 @@ Preload.prototype = {
     this.load.setPreloadSprite(this.asset);
     this.load.spritesheet('soldier', 'assets/soldier_fall.png', 61, 200, 15);
     this.load.image('crosshair', 'assets/crosshair.png');
-    this.load.audio('shoot', 'assets/shoot.wav');
+    this.load.audio('shoot', 'assets/ar15.wav');
     this.load.audio('hit', 'assets/hit.wav');
   },
   create: function() {

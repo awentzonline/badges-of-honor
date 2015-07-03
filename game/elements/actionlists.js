@@ -15,6 +15,11 @@ ActionLists.prototype = {
     this.actionList = this.actionLists[name];
     this.actionList.start();
   },
+  stop: function (name) {
+    if (this.actionList) {
+      this.actionList.stop();
+    }
+  },
   update: function () {
     if (this.actionList) {
       this.actionList.update();

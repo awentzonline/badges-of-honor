@@ -4,7 +4,11 @@ module.exports = ReaderAction;
 
 function ReaderAction(options) {
   this.textObject = options.textObject;
-  this.lines = options.lines;
+  if (options.randomLines) {
+    this.lines = options.randomLines[Math.floor(Math.random() * options.randomLines.length)];
+  } else {
+    this.lines = options.lines;  
+  }
   this.displayTime = options.displayTime || 1000;
   this.hideTime = options.hideTime || 500;
 }
@@ -33,8 +37,10 @@ ReaderAction.prototype = {
     }, this);
   },
   stop: function () {
-    this.tween.stop();
-    this.game.tweens.remove(this.tween);
-    this.tween = null;
+    if (this.tween) {
+      this.tween.stop();
+      this.game.tweens.remove(this.tween);
+      this.tween = null;
+    }
   }
 }
