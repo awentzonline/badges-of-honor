@@ -16,6 +16,7 @@ Play.prototype = {
   init: function (levelId) {
     this.levelId = levelId || 0;
     this.levelConfig = levelConfigs[this.levelId % levelConfigs.length];
+    this.game.score = this.game.score || 0;
   },
   preload: function () {
     this.game.load.image('background', 'assets/' + this.levelConfig.background);
@@ -55,6 +56,13 @@ Play.prototype = {
       align: 'center'
     });
     this.commandText.anchor.setTo(0.5, 0.5);
+    //
+    this.interpScore = this.game.score;
+    this.scoreText = this.game.add.text(this.game.width * 0.8, this.game.height * 0.05, this.interpScore, {
+      font: '32px Arial',
+      fill: 'white',
+      align: 'right'
+    });
     //
     this.allowedToShoot = false;
     this.createScripts();
@@ -164,6 +172,15 @@ Play.prototype = {
       this.onWin();
     }
     this.actionLists.update();
+    this.updateScoreboard();
+  },
+  updateScoreboard: function () {
+    var ds = this.game.score - this.interpScore;
+    if (Math.abs(ds) > 0) {
+      this.interpScore += Math.max(1, ds * 0.2);
+      this.interpScore = Math.min(this.interpScore, this.game.score);
+      this.scoreText.text = Math.floor(this.interpScore);
+    }
   },
   enemyShot: function(enemy) {
     if (enemy.isDying) {
@@ -174,7 +191,9 @@ Play.prototype = {
     }
     enemy.isDying = true;
     enemy.play('die', 30);
-    this.createScoreBlip(enemy.x, enemy.y - enemy.height * enemy.anchor.y, '+100');
+    var scoreValue = 100;
+    this.game.score += scoreValue;
+    this.createScoreBlip(enemy.x, enemy.y - enemy.height * enemy.anchor.y, '+' + scoreValue);
   },
   createScoreBlip: function (x, y, value) {
     var blip = this.scoreBlips.getFirstExists(false);
