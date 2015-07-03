@@ -26,7 +26,7 @@ Menu.prototype = {
     var pointer = this.game.input.activePointer;
     if(pointer && pointer.justPressed()) {
       this.game.sound.play('shoot')
-      this.game.state.start('play', true, false, 0);
+      this.game.state.start('jobAssignment', true, false, 0);
     }
   }
 };
