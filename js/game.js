@@ -883,6 +883,8 @@ Play.prototype = {
   },
   create: function() {
     this.background = this.game.add.sprite(0, 0, 'background');
+    this.shade = this.game.add.sprite(0, -90, 'shade');
+    //this.shade.alpha = 0.75;
     // splatter
     this.bloodsplosion = new Bloodsplosion(this.game);
     // enemies
@@ -913,7 +915,7 @@ Play.prototype = {
     //
     this.winTriggered = false;
     //
-    this.commandText = this.game.add.bitmapText(this.game.width * 0.5, this.game.height * 0.15, 'dday', '', 36);
+    this.commandText = this.game.add.bitmapText(this.game.width * 0.5, this.game.height * 0.125, 'dday', '', 36);
     this.commandText.anchor.setTo(0.5, 0);
     //
     this.interpScore = this.game.score;
@@ -1178,6 +1180,7 @@ Preload.prototype = {
     this.load.image('bloodsplat', 'assets/bloodsplat.png');
     this.load.image('m16ammo', 'assets/m16ammo.png');
     this.load.image('badge', 'assets/badge.png');
+    this.load.image('shade', 'assets/shade.png');
     this.load.audio('shoot', ['assets/ar15.m4a', 'assets/ar15.ogg']);
     this.load.audio('hit', 'assets/hit.wav');
     this.load.audio('select', 'assets/select.wav');
@@ -1189,7 +1192,7 @@ Preload.prototype = {
   },
   update: function() {
     if(!!this.ready) {
-      this.game.state.start('menu');
+      this.game.state.start('play');
     }
   },
   onLoadComplete: function() {
