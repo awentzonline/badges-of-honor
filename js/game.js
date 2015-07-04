@@ -2,7 +2,7 @@
 'use strict';
 
 module.exports = [
-  [100, ' First\nBlood'],
+  [100, 'First\nBlood'],
   [200, 'Second\n Blood'],
   [300, 'Killing\n Spree'],
   [500, ' Competent\nGun Operator'],
@@ -38,10 +38,11 @@ module.exports = [
   [15500, '20,000 Hours\n AOL Access'],
   [16000, 'Ramboesque'],
   [16500, 'Olive Garden\n$50 Gift Card'],
-  [17000, 'For Bravery'],
+  [17000, 'The President\n Dreams of You'],
   [17500, 'YOU CAN BE\n ANYTHING'],
   [18000, 'Dangerously\nPresidential'],
-  [18500, 'Promoted to\nVP of Bullets']
+  [18500, 'Promoted to\nVP of Bullets'],
+  [19000, 'Presidential\n nightmare']
 ];
 
 },{}],2:[function(require,module,exports){
@@ -71,6 +72,27 @@ module.exports = [
     ]
   },
   {
+    background: 'level0.jpg',
+    targets: [
+      {
+        x: 0.6,
+        y: 0.7
+      },
+      {
+        x: 0.7,
+        y: 0.8
+      },
+      {
+        x: 0.8,
+        y: 0.75
+      },
+      {
+        x: 0.85,
+        y: 0.6
+      },
+    ]
+  },
+  {
     background: 'level1.jpg',
     targets: [
       {
@@ -95,6 +117,10 @@ module.exports = [
     background: 'level1.jpg',
     targets: [
       {
+        x: 0.3,
+        y: 0.75
+      },
+      {
         x: 0.6,
         y: 0.8
       },
@@ -105,6 +131,10 @@ module.exports = [
       {
         x: 0.61,
         y: 0.75
+      },
+      {
+        x: 0.8,
+        y: 0.8
       },
       {
         x: 0.6,
@@ -357,7 +387,203 @@ module.exports = [
         y: 0.8
       }
     ]
-  }
+  },
+  {
+    background: 'level0.jpg',
+    targets: [
+      {
+        x: 0.45,
+        y: 0.7
+      },
+      {
+        x: 0.5,
+        y: 0.8
+      },
+      {
+        x: 0.6,
+        y: 0.83
+      },
+      {
+        x: 0.72,
+        y: 0.84
+      },
+      {
+        x: 0.75,
+        y: 0.6
+      },
+      {
+        x: 0.85,
+        y: 0.64
+      },
+      {
+        x: 0.8,
+        y: 0.8
+      }
+    ]
+  },
+  {
+    background: 'level0.jpg',
+    targets: [
+      {
+        x: 0.4,
+        y: 0.65
+      },
+      {
+        x: 0.5,
+        y: 0.7
+      },
+      {
+        x: 0.6,
+        y: 0.71
+      },
+      {
+        x: 0.72,
+        y: 0.75
+      },
+      {
+        x: 0.75,
+        y: 0.6
+      },
+      {
+        x: 0.85,
+        y: 0.64
+      },
+      {
+        x: 0.85,
+        y: 0.54
+      },
+      {
+        x: 0.8,
+        y: 0.8
+      },
+      {
+        x: 0.75,
+        y: 0.85
+      },
+      {
+        x: 0.65,
+        y: 0.86
+      },
+      {
+        x: 0.55,
+        y: 0.86
+      }
+    ]
+  },
+  {
+    background: 'level1.jpg',
+    targets: [
+      {
+        x: 0.3,
+        y: 0.75
+      },
+      {
+        x: 0.6,
+        y: 0.8
+      },
+      {
+        x: 0.55,
+        y: 0.85
+      },
+      {
+        x: 0.61,
+        y: 0.75
+      },
+      {
+        x: 0.6,
+        y: 0.78
+      },
+      {
+        x: 0.8,
+        y: 0.8
+      },
+      {
+        x: 0.7,
+        y: 0.82
+      },
+      {
+        x: 0.45,
+        y: 0.83
+      },
+      {
+        x: 0.3,
+        y: 0.79
+      },
+      {
+        x: 0.15,
+        y: 0.7
+      },
+    ]
+  },
+  {
+    background: 'level1.jpg',
+    targets: [
+      {
+        x: 0.6,
+        y: 0.9
+      },
+      {
+        x: 0.55,
+        y: 0.83
+      },
+      {
+        x: 0.61,
+        y: 0.8
+      },
+      {
+        x: 0.65,
+        y: 0.78
+      },
+      {
+        x: 0.15,
+        y: 0.81
+      },
+      {
+        x: 0.25,
+        y: 0.83
+      },
+      {
+        x: 0.3,
+        y: 0.76
+      },
+      {
+        x: 0.2,
+        y: 0.78
+      },
+      {
+        x: 0.4,
+        y: 0.8
+      },
+      {
+        x: 0.32,
+        y: 0.85
+      },
+      {
+        x: 0.42,
+        y: 0.73
+      },
+      {
+        x: 0.4,
+        y: 0.78
+      },
+      {
+        x: 0.8,
+        y: 0.83
+      },
+      {
+        x: 0.78,
+        y: 0.87
+      },
+      {
+        x: 0.81,
+        y: 0.73
+      },
+      {
+        x: 0.8,
+        y: 0.79
+      }
+    ]
+  },
 ];
 
 },{}],3:[function(require,module,exports){
