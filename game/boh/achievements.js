@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = [
-  [100, ' First\nBlood'],
+  [100, 'First\nBlood'],
   [200, 'Second\n Blood'],
   [300, 'Killing\n Spree'],
   [500, ' Competent\nGun Operator'],
@@ -37,8 +37,9 @@ module.exports = [
   [15500, '20,000 Hours\n AOL Access'],
   [16000, 'Ramboesque'],
   [16500, 'Olive Garden\n$50 Gift Card'],
-  [17000, 'For Bravery'],
+  [17000, 'The President\n Dreams of You'],
   [17500, 'YOU CAN BE\n ANYTHING'],
   [18000, 'Dangerously\nPresidential'],
-  [18500, 'Promoted to\nVP of Bullets']
+  [18500, 'Promoted to\nVP of Bullets'],
+  [19000, 'Presidential\n nightmare']
 ];
