@@ -9,8 +9,8 @@ module.exports = [
   [1000, 'The President\n   Loves You'],
   [1500, 'REALLY GOOD'],
   [2000, 'SO GOOD'],
-  [2500, 'YOU CAN BE\n ANYTHING'],
-  [3000, 'True Patriot'],
+  [2500, ' Good for\n1 massage'],
+  [3000, 'Dinosaur of\nGun Violence'],
   [3500, ' Senatorial\nEagle Prize'],
   [4000, ' 25%\nRaise'],
   [4500, 'President\nof the army'],
@@ -26,8 +26,8 @@ module.exports = [
   [9500, '   Best\nKill-Guy'],
   [10000, '   Total\nSnakedick'],
   [10500, '     35%\nCommission'],
-  [11000, 'SUPER SOLDIER'],
-  [11500, 'Real good\n  SOLDIER'],
+  [11000, 'Real good\n  SOLDIER'],
+  [11500, 'SUPER SOLDIER'],
   [12000, 'ADMIRAL'],
   [12500, 'PROMOTED TO\n BIG GENERAL'],
   [13000, ' Extremely\nPresidential'],
@@ -35,8 +35,13 @@ module.exports = [
   [14000, 'Cost of living\n Adjustment'],
   [14500, ' You are\nthe flag'],
   [15000, 'Found $20'],
-  [15500, ' Wife is\nImpressed'],
-  [16000, 'Ramboesque']
+  [15500, '20,000 Hours\n AOL Access'],
+  [16000, 'Ramboesque'],
+  [16500, 'Olive Garden\n$50 Gift Card'],
+  [17000, 'For Bravery'],
+  [17500, 'YOU CAN BE\n ANYTHING'],
+  [18000, 'Dangerously\nPresidential'],
+  [18500, 'Promoted to\nVP of Bullets']
 ];
 
 },{}],2:[function(require,module,exports){
@@ -616,9 +621,15 @@ JobAssignment.prototype = {
     this.titleText.anchor.setTo(0.5, 0.5);
 
     this.instructionsText = this.game.add.bitmapText(
-      this.game.world.centerX, this.game.height * 0.3, 'dday', 'You\'re in the army now, hotshot\nLet\'s get you an assignment', 28
+      this.game.world.centerX, this.game.height * 0.35, 'dday', 'You\'re in the army now, hotshot\nLet\'s get you an assignment', 28
     );
     this.instructionsText.anchor.setTo(0.5, 0.5);
+
+    this.alrightText = this.game.add.bitmapText(
+      this.game.world.centerX, this.game.height * 0.65, 'dday', 'Here are your boots. Move out!', 28
+    );
+    this.alrightText.anchor.setTo(0.5, 0.5);
+    this.alrightText.visible = false;
 
     this.crosshair = new Crosshair(this.game, 0, 0);
     this.game.add.existing(this.crosshair);
@@ -643,8 +654,9 @@ JobAssignment.prototype = {
         var tween = this.game.add.tween(this.assignmentText.scale).to(
           {x:2, y:2}, 1000, Phaser.Easing.Elastic.Out, true, 0
         );
+        this.alrightText.visible = true;
       }
-      if(this.assignmentCountdown < -2) {
+      if(this.assignmentCountdown < -4) {
         this.game.state.start('play', true, false, 0);
       }
     } else {
@@ -881,7 +893,7 @@ Play.prototype = {
           textObject: this.commandText,
           lines: [
             'You wasted all of your ammo',
-            'The President is pissed'
+            'The President is livid'
           ]
         }),
         new WaitAction(1),

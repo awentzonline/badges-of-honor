@@ -175,7 +175,7 @@ Play.prototype = {
           textObject: this.commandText,
           lines: [
             'You wasted all of your ammo',
-            'The President is pissed'
+            'The President is livid'
           ]
         }),
         new WaitAction(1),

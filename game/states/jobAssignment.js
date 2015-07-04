@@ -15,9 +15,15 @@ JobAssignment.prototype = {
     this.titleText.anchor.setTo(0.5, 0.5);
 
     this.instructionsText = this.game.add.bitmapText(
-      this.game.world.centerX, this.game.height * 0.3, 'dday', 'You\'re in the army now, hotshot\nLet\'s get you an assignment', 28
+      this.game.world.centerX, this.game.height * 0.35, 'dday', 'You\'re in the army now, hotshot\nLet\'s get you an assignment', 28
     );
     this.instructionsText.anchor.setTo(0.5, 0.5);
+
+    this.alrightText = this.game.add.bitmapText(
+      this.game.world.centerX, this.game.height * 0.65, 'dday', 'Here are your boots. Move out!', 28
+    );
+    this.alrightText.anchor.setTo(0.5, 0.5);
+    this.alrightText.visible = false;
 
     this.crosshair = new Crosshair(this.game, 0, 0);
     this.game.add.existing(this.crosshair);
@@ -42,8 +48,9 @@ JobAssignment.prototype = {
         var tween = this.game.add.tween(this.assignmentText.scale).to(
           {x:2, y:2}, 1000, Phaser.Easing.Elastic.Out, true, 0
         );
+        this.alrightText.visible = true;
       }
-      if(this.assignmentCountdown < -2) {
+      if(this.assignmentCountdown < -4) {
         this.game.state.start('play', true, false, 0);
       }
     } else {
