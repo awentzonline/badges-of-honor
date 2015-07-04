@@ -29,6 +29,8 @@ Play.prototype = {
   },
   create: function() {
     this.background = this.game.add.sprite(0, 0, 'background');
+    this.shade = this.game.add.sprite(0, -90, 'shade');
+    //this.shade.alpha = 0.75;
     // splatter
     this.bloodsplosion = new Bloodsplosion(this.game);
     // enemies
@@ -59,7 +61,7 @@ Play.prototype = {
     //
     this.winTriggered = false;
     //
-    this.commandText = this.game.add.bitmapText(this.game.width * 0.5, this.game.height * 0.15, 'dday', '', 36);
+    this.commandText = this.game.add.bitmapText(this.game.width * 0.5, this.game.height * 0.125, 'dday', '', 36);
     this.commandText.anchor.setTo(0.5, 0);
     //
     this.interpScore = this.game.score;

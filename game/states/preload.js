@@ -16,6 +16,7 @@ Preload.prototype = {
     this.load.image('bloodsplat', 'assets/bloodsplat.png');
     this.load.image('m16ammo', 'assets/m16ammo.png');
     this.load.image('badge', 'assets/badge.png');
+    this.load.image('shade', 'assets/shade.png');
     this.load.audio('shoot', ['assets/ar15.m4a', 'assets/ar15.ogg']);
     this.load.audio('hit', 'assets/hit.wav');
     this.load.audio('select', 'assets/select.wav');
@@ -27,7 +28,7 @@ Preload.prototype = {
   },
   update: function() {
     if(!!this.ready) {
-      this.game.state.start('menu');
+      this.game.state.start('play');
     }
   },
   onLoadComplete: function() {
