@@ -5,7 +5,7 @@ module.exports = [
   [200, 'Second\n Blood'],
   [300, 'Killing\n Spree'],
   [500, ' Competent\nGun Operator'],
-  [1000, 'The President\n   Loves You'],
+  [1000, 'The President\nIs fond of You'],
   [1500, 'Magnificent\n   Gunnery'],
   [2000, 'SO GOOD'],
   [2500, ' Good for\n1 massage'],

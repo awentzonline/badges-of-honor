@@ -20,7 +20,7 @@ JobAssignment.prototype = {
     this.instructionsText.anchor.setTo(0.5, 0.5);
 
     this.alrightText = this.game.add.bitmapText(
-      this.game.world.centerX, this.game.height * 0.65, 'dday', 'Here are your boots. Move out!', 28
+      this.game.world.centerX, this.game.height * 0.65, 'dday', 'You\'ll be executing enemy prisoners.\nHere are your boots. Move out!', 24
     );
     this.alrightText.anchor.setTo(0.5, 0.5);
     this.alrightText.visible = false;
