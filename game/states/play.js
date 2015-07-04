@@ -76,6 +76,10 @@ Play.prototype = {
     this.game.add.existing(this.badgeBlips);
     if (this.levelId == 0) {
       this.showBadgeBlip('Enlistment\n   Bonus')
+    } else {
+      if (this.levelId % levelConfigs.length == 0) {
+        this.showBadgeBlip('Prestige!');
+      }
     }
   },
   createScripts: function () {

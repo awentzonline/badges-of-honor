@@ -221,6 +221,142 @@ module.exports = [
         y: 0.78
       }
     ]
+  },
+  {
+    background: 'level2.jpg',
+    targets: [
+      {
+        x: 0.24,
+        y: 0.75
+      },
+      {
+        x: 0.4,
+        y: 0.8
+      },
+      {
+        x: 0.55,
+        y: 0.81
+      },
+      {
+        x: 0.7,
+        y: 0.85
+      },
+      {
+        x: 0.9,
+        y: 0.86
+      }
+    ]
+  },
+  {
+    background: 'level2.jpg',
+    targets: [
+      {
+        x: 0.24,
+        y: 0.75
+      },
+      {
+        x: 0.1,
+        y: 0.8
+      },
+      {
+        x: 0.34,
+        y: 0.9
+      },
+      {
+        x: 0.4,
+        y: 0.8
+      },
+      {
+        x: 0.5,
+        y: 0.87
+      },
+      {
+        x: 0.55,
+        y: 0.81
+      },
+      {
+        x: 0.63,
+        y: 0.75
+      },
+      {
+        x: 0.7,
+        y: 0.85
+      },
+      {
+        x: 0.8,
+        y: 0.74
+      },
+      {
+        x: 0.9,
+        y: 0.86
+      }
+    ]
+  },
+  {
+    background: 'level2.jpg',
+    targets: [
+      {
+        x: 0.24,
+        y: 0.75
+      },
+      {
+        x: 0.31,
+        y: 0.77
+      },
+      {
+        x: 0.43,
+        y: 0.8
+      },
+      {
+        x: 0.5,
+        y: 0.81
+      },
+      {
+        x: 0.6,
+        y: 0.83
+      },
+      {
+        x: 0.7,
+        y: 0.85
+      },
+      {
+        x: 0.78,
+        y: 0.88
+      },
+      {
+        x: 0.9,
+        y: 0.86
+      }
+    ]
+  },
+  {
+    background: 'level0.jpg',
+    targets: [
+      {
+        x: 0.5,
+        y: 0.7
+      },
+      {
+        x: 0.6,
+        y: 0.71
+      },
+      {
+        x: 0.72,
+        y: 0.75
+      },
+      {
+        x: 0.75,
+        y: 0.6
+      },
+      {
+        x: 0.85,
+        y: 0.64
+      },
+      {
+        x: 0.8,
+        y: 0.8
+      }
+    ]
   }
 ];
 
@@ -794,6 +930,10 @@ Play.prototype = {
     this.game.add.existing(this.badgeBlips);
     if (this.levelId == 0) {
       this.showBadgeBlip('Enlistment\n   Bonus')
+    } else {
+      if (this.levelId % levelConfigs.length == 0) {
+        this.showBadgeBlip('Prestige!');
+      }
     }
   },
   createScripts: function () {
@@ -1049,7 +1189,7 @@ Preload.prototype = {
   },
   update: function() {
     if(!!this.ready) {
-      this.game.state.start('menu');
+      this.game.state.start('play');
     }
   },
   onLoadComplete: function() {
